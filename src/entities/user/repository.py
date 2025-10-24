@@ -47,6 +47,7 @@ class UserRepository:
         user.username = username
         try:
             await self._session.flush()
+            await self._session.refresh(user)
             await self._session.commit()
         except IntegrityError:
             raise UserAlredyExistsException(username)
