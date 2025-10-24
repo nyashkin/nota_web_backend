@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, Path
-
+from starlette import status
 from src.entities.user.dependencies import UserServiceDI
 from src.entities.user.exceptions.domain import (
     UserAlredyExistsException,
@@ -18,7 +18,7 @@ from pydantic import PositiveInt
 router = APIRouter(prefix="/users")
 
 
-@router.post("/", response_model=UserReadSchema)
+@router.post("/", response_model=UserReadSchema, status_code=status.HTTP_201_CREATED)
 async def create_user(
     user_service: UserServiceDI, create_user: UserSchemaCreate
 ) -> UserReadSchema:
@@ -31,23 +31,23 @@ async def create_user(
         raise UserUknownError(e)
 
 
-@router.get(path="/{id}", response_model=UserReadSchema)
+@router.get(path="/{user_id}", response_model=UserReadSchema)
 async def get_user_by_id(
-    user_service: UserServiceDI, id: Annotated[PositiveInt, Path()]
+    user_service: UserServiceDI, user_id: Annotated[PositiveInt, Path()]
 ) -> UserReadSchema:
     try:
-        user_read = await user_service.get_user_by_id(id)
+        user_read = await user_service.get_user_by_id(user_id)
         return user_read
     except UserNotFoundException as e:
         raise UserNotFoundError(e)
 
 
-@router.put(path="/{id}", response_model=UserReadSchema)
+@router.put(path="/{user_id}", response_model=UserReadSchema)
 async def update_username(
-    user_service: UserServiceDI, id: Annotated[int, Path()], username: str
+    user_service: UserServiceDI, user_id: Annotated[int, Path()], new_username: str
 ) -> UserReadSchema:
     try:
-        user_read = await user_service.change_username(id, username)
+        user_read = await user_service.change_username(user_id, new_username)
         return user_read
     except UserAlredyExistsException as e:
         raise UserAlreadyExistsError(e)

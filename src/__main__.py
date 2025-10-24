@@ -7,6 +7,8 @@ def include_routers(app: FastAPI):
     routers = (user_router,)
     for router in routers:
         app.include_router(router)
+
+
 def get_app() -> FastAPI:
     app = FastAPI(debug=True)
     include_routers(app)
