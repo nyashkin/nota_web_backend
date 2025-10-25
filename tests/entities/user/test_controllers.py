@@ -16,6 +16,9 @@ class TestUserControllers:
             username="user",
             password="secret_password",
             role=UserRole.USER,
+            phone_number="+11111111111",
+            first_name="John",
+            last_name="Doe",
         )
         response = client.post("/users/", json=create_user_schema.model_dump())
         shared_data["created_user_json"] = response.text
