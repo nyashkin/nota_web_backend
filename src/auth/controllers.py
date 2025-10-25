@@ -62,19 +62,8 @@ async def login(
 
 @auth_router.post("/logout", response_model=AuthTokenRead)
 async def logout(
-    auth_service: AuthServiceDI,
-    creds: Annotated[OAuth2PasswordRequestForm, Depends()],
     response: Response,
-) -> AuthTokenRead:
-    try:
-        token_read = await auth_service.login_user(
-            username=creds.username, password=creds.password
-        )
-    except UserByUsernameNotFoundException:
-        raise UserByUsernameNotFoundError
-    except UserUknownException:
-        raise UserUknownError
-
+) -> dict[str, str]:
     response.delete_cookie(
         key="refresh_token",
         httponly=True,
@@ -82,8 +71,7 @@ async def logout(
         samesite="strict",
         path=AuthUrls.REFRESH_URL,
     )
-
-    return AuthTokenRead(access_token=token_read.access_token)
+    return {"message": "ok"}
 
 
 @auth_router.post("/register", response_model=UserReadSchema)
