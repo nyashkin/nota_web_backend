@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +9,7 @@ from src.entities.user.exceptions.domain import (
     UserUknownException,
 )
 from src.entities.user.models import UserOrm
-from src.entities.user.schemas import UserCreateSchema, UserReadSchema
+from src.entities.user.schemas import UserCreateSchema, UserReadSchema, UserUpdateSchema
 
 
 class UserRepository:
@@ -52,6 +52,19 @@ class UserRepository:
             raise UserAlredyExistsException(username)
         except Exception as e:
             raise UserUknownException(e)
+
+    async def update_user(
+        self,
+        id: int,
+        update_user: UserUpdateSchema,
+    ) -> UserReadSchema:
+        stmt = update(UserOrm).where(UserOrm.id == id).values(update_user.model_dump())
+        try:
+            await self._session.execute(stmt)
+            user_orm = await self._get_user_model_by_id(id)
+        except (SQLAlchemyError, UserUknownException):
+            raise UserUknownException
+        return UserReadSchema.model_validate(user_orm)
 
     async def _get_user_model_by_id(self, id: int) -> UserOrm:
         query = select(UserOrm).where(UserOrm.id == id)

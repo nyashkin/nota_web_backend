@@ -1,9 +1,9 @@
 from src.core.exceptions.domain import BaseDomainException
-from src.entities.user.schemas import UserBaseSchema
+from src.entities.user.schemas import UserUpdateSchema
 
 
 class BaseUserException(BaseDomainException):
-    def __init__(self, user: UserBaseSchema):
+    def __init__(self, user: UserUpdateSchema):
         self.user = user
 
 
