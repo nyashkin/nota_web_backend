@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings
-from pydantic import PositiveInt, PostgresDsn, SecretStr
+from pydantic import PostgresDsn, SecretStr, PositiveInt
 
 
 class DatabaseConfig(BaseSettings, env_prefix="DB_"):

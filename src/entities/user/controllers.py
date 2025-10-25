@@ -1,6 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Path
 from starlette import status
+from src.auth.dependencies import CurrentUserDI
 from src.entities.user.dependencies import UserServiceDI
 from src.entities.user.exceptions.domain import (
     UserAlredyExistsException,
@@ -12,15 +13,22 @@ from src.entities.user.exceptions.http import (
     UserNotFoundError,
     UserUknownError,
 )
-from src.entities.user.schemas import UserSchemaCreate, UserReadSchema
+from src.entities.user.schemas import UserCreateSchema, UserReadSchema
 from pydantic import PositiveInt
 
-router = APIRouter(prefix="/users")
+user_router = APIRouter(prefix="/users", tags=["👥 Users"])
 
 
-@router.post("/", response_model=UserReadSchema, status_code=status.HTTP_201_CREATED)
+@user_router.get("/me")
+def get_me(user: CurrentUserDI) -> UserReadSchema:
+    return user
+
+
+@user_router.post(
+    "/", response_model=UserReadSchema, status_code=status.HTTP_201_CREATED
+)
 async def create_user(
-    user_service: UserServiceDI, create_user: UserSchemaCreate
+    user_service: UserServiceDI, create_user: UserCreateSchema
 ) -> UserReadSchema:
     try:
         user_read = await user_service.create_user(create_user)
@@ -31,7 +39,7 @@ async def create_user(
         raise UserUknownError(e)
 
 
-@router.get(path="/{user_id}", response_model=UserReadSchema)
+@user_router.get(path="/{user_id}", response_model=UserReadSchema)
 async def get_user_by_id(
     user_service: UserServiceDI, user_id: Annotated[PositiveInt, Path()]
 ) -> UserReadSchema:
@@ -40,9 +48,11 @@ async def get_user_by_id(
         return user_read
     except UserNotFoundException as e:
         raise UserNotFoundError(e)
+    except UserUknownException:
+        raise UserUknownError
 
 
-@router.put(path="/{user_id}", response_model=UserReadSchema)
+@user_router.put(path="/{user_id}", response_model=UserReadSchema)
 async def update_username(
     user_service: UserServiceDI, user_id: Annotated[int, Path()], new_username: str
 ) -> UserReadSchema:

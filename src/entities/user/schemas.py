@@ -15,5 +15,9 @@ class UserReadSchema(UserBaseSchema):
     updated_at: datetime
 
 
-class UserSchemaCreate(UserBaseSchema):
+class UserCreateSchema(UserBaseSchema):
     password: str
+
+
+class UserFullSchema(UserCreateSchema):
+    id: int
