@@ -31,4 +31,4 @@ dev = [
 plugins = ['pydantic.mypy']
 
 [tool.ruff.lint]
-select = ["I"]
+select = ["I", "E", "W", "F"]

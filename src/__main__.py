@@ -1,7 +1,8 @@
+import uvicorn
+from fastapi import FastAPI
+
 from src.auth.controllers import auth_router
 from src.entities.user.controllers import user_router
-from fastapi import FastAPI
-import uvicorn
 
 
 def include_routers(app: FastAPI):

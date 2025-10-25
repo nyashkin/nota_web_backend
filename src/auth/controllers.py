@@ -1,7 +1,9 @@
 from datetime import timedelta
 from typing import Annotated
-from fastapi import APIRouter, Depends, Cookie, Response
+
+from fastapi import APIRouter, Cookie, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
+
 from src.auth.dependencies import AuthServiceDI
 from src.auth.enums import AuthUrls
 from src.auth.exceptions.domain import (
@@ -10,8 +12,10 @@ from src.auth.exceptions.domain import (
 )
 from src.auth.exceptions.http import InvalidJwtTokenError, JwtTokenExpiredError
 from src.auth.schemas import AuthTokenRead
+from src.core import config
 from src.entities.user.exceptions.domain import (
     UserAlredyExistsException,
+    UserByUsernameNotFoundException,
     UserNotFoundException,
     UserUknownException,
 )
@@ -22,7 +26,6 @@ from src.entities.user.exceptions.http import (
     UserUknownError,
 )
 from src.entities.user.schemas import UserCreateSchema, UserReadSchema
-from src.core import config
 
 auth_router = APIRouter(prefix="/auth", tags=["🔑 Auth"])
 
@@ -37,8 +40,8 @@ async def login(
         token_read = await auth_service.login_user(
             username=creds.username, password=creds.password
         )
-    except UserByUsernameNotFoundError:
-        raise
+    except UserByUsernameNotFoundException:
+        raise UserByUsernameNotFoundError
     except UserUknownException:
         raise UserUknownError
 

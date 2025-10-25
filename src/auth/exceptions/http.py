@@ -1,4 +1,5 @@
 from fastapi import status
+
 from src.core.exceptions.http import BaseHTTPException
 
 
@@ -10,3 +11,8 @@ class JwtTokenExpiredError(BaseHTTPException):
 class InvalidJwtTokenError(BaseHTTPException):
     def __init__(self) -> None:
         super().__init__(status.HTTP_400_BAD_REQUEST, "Invalid jwt token", None)
+
+
+class InvalidJwtTokenTypeError(BaseHTTPException):
+    def __init__(self) -> None:
+        super().__init__(status.HTTP_400_BAD_REQUEST, "Invalid jwt token type", None)

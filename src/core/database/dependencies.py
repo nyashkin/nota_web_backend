@@ -1,6 +1,8 @@
-from fastapi import Depends
 from typing import Annotated, AsyncGenerator
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
 from src.core.database.session_factory import get_session_maker
 from src.core.database.uow import UoW
 

@@ -1,4 +1,5 @@
 from fastapi import status
+
 from src.core.exceptions.http import BaseHTTPException
 from src.entities.user.exceptions.domain import (
     UserAlredyExistsException,
@@ -13,7 +14,7 @@ class UserNotFoundError(BaseHTTPException):
         if not exc:
             super().__init__(status.HTTP_404_NOT_FOUND, "User not found", None)
             return
-        super().__init__(status.HTTP_404_NOT_FOUN, str(exc), None)
+        super().__init__(status.HTTP_404_NOT_FOUND, str(exc), None)
 
 
 class UserByUsernameNotFoundError(BaseHTTPException):
@@ -21,7 +22,7 @@ class UserByUsernameNotFoundError(BaseHTTPException):
         if not exc:
             super().__init__(status.HTTP_404_NOT_FOUND, "User not found", None)
             return
-        super().__init__(status.HTTP_404_NOT_FOUN, str(exc), None)
+        super().__init__(status.HTTP_404_NOT_FOUND, str(exc), None)
 
 
 class UserAlreadyExistsError(BaseHTTPException):

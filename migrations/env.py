@@ -1,13 +1,11 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
-from src.core.database.base_model import BaseOrm
-from src.entities.user.models import UserOrm  # noqa: F401
+from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 from src.core import config as app_config
-from alembic import context
+from src.core.database.base_model import BaseOrm
+from src.entities.user.models import UserOrm  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -1,7 +1,8 @@
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
-from src.core.database.mixins import TimestampMixin, IdMixin
+from sqlalchemy.orm import Mapped, mapped_column
+
 from src.core.database.base_model import BaseOrm
+from src.core.database.mixins import IdMixin, TimestampMixin
 from src.entities.user.enums import UserRole
 
 

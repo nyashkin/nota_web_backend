@@ -1,8 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from src.entities.user.schemas import UserReadSchema, UserCreateSchema
 from src.entities.user.enums import UserRole
+from src.entities.user.schemas import UserCreateSchema, UserReadSchema
 
 
 @pytest.fixture(scope="class")
