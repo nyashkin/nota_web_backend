@@ -60,6 +60,32 @@ async def login(
     return AuthTokenRead(access_token=token_read.access_token)
 
 
+@auth_router.post("/logout", response_model=AuthTokenRead)
+async def logout(
+    auth_service: AuthServiceDI,
+    creds: Annotated[OAuth2PasswordRequestForm, Depends()],
+    response: Response,
+) -> AuthTokenRead:
+    try:
+        token_read = await auth_service.login_user(
+            username=creds.username, password=creds.password
+        )
+    except UserByUsernameNotFoundException:
+        raise UserByUsernameNotFoundError
+    except UserUknownException:
+        raise UserUknownError
+
+    response.delete_cookie(
+        key="refresh_token",
+        httponly=True,
+        secure=False,
+        samesite="strict",
+        path=AuthUrls.REFRESH_URL,
+    )
+
+    return AuthTokenRead(access_token=token_read.access_token)
+
+
 @auth_router.post("/register", response_model=UserReadSchema)
 async def register(
     auth_service: AuthServiceDI, create_user: UserCreateSchema
