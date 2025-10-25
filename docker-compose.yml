@@ -1,0 +1,30 @@
+services:
+  database:
+    image: postgres:17-alpine
+    hostname: database
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    environment:
+      - PGPORT=${DB_PORT}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend-network
+    restart: unless-stopped
+  
+volumes:
+  db-data:
+    name: db-data
+
+networks:
+  backend-network:
+    name: backend-network
