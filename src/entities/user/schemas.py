@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from pydantic import PositiveInt
+
 from src.core.schemas import BaseAppSchema
 from src.entities.user.enums import UserRole
-from datetime import datetime
 
 
 class UserBaseSchema(BaseAppSchema):

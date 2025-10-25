@@ -1,7 +1,8 @@
-import jwt
 from typing import Self
+
+import jwt
+from pydantic import PositiveInt, ValidationError, model_validator
 from pydantic_settings import BaseSettings
-from pydantic import PositiveInt, model_validator, ValidationError
 
 
 class AuthConfig(BaseSettings, env_prefix="AUTH_"):

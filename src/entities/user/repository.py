@@ -1,15 +1,15 @@
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.entities.user.exceptions.domain import (
     UserAlredyExistsException,
     UserByUsernameNotFoundException,
     UserNotFoundException,
     UserUknownException,
 )
-from src.entities.user.schemas import UserCreateSchema, UserReadSchema
 from src.entities.user.models import UserOrm
-from sqlalchemy.exc import IntegrityError
+from src.entities.user.schemas import UserCreateSchema, UserReadSchema
 
 
 class UserRepository:

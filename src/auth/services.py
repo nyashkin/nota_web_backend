@@ -1,6 +1,9 @@
+from datetime import datetime, timedelta, timezone
+from uuid import uuid4
+
 import jwt
 from loguru import logger
-from uuid import uuid4
+
 from src.auth.enums import TokenType
 from src.auth.exceptions.domain import (
     InvalidJwtTokenException,
@@ -8,16 +11,15 @@ from src.auth.exceptions.domain import (
     PasswordOrUsernameInvalidException,
 )
 from src.auth.schemas import AuthTokenRead, TokenPayloadSchema, TokenRead
-from src.auth.utils import hash_password, check_password
+from src.auth.utils import check_password, hash_password
+from src.core import config
+from src.core.database.dependencies import UoWDI
 from src.entities.user.exceptions.domain import (
     UserAlredyExistsException,
     UserByUsernameNotFoundException,
     UserUknownException,
 )
-from src.entities.user.schemas import UserReadSchema, UserCreateSchema
-from src.core.database.dependencies import UoWDI
-from src.core import config
-from datetime import datetime, timezone, timedelta
+from src.entities.user.schemas import UserCreateSchema, UserReadSchema
 
 
 class CryptoService:

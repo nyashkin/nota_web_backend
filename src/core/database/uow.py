@@ -1,6 +1,8 @@
 from types import TracebackType
 from typing import Self
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
 from src.entities.user.repository import UserRepository
 
 

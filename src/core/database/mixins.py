@@ -1,7 +1,7 @@
-from sqlalchemy.orm import mapped_column, Mapped
-from sqlalchemy import BigInteger
-from sqlalchemy import DateTime, func
 from datetime import datetime
+
+from sqlalchemy import BigInteger, DateTime, func
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class TimestampMixin:
