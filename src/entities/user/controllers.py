@@ -15,18 +15,60 @@ from src.entities.user.exceptions.http import (
     UserNotFoundError,
     UserUknownError,
 )
-from src.entities.user.schemas import UserReadSchema
+from src.entities.user.schemas import UserReadSchema, UserUpdateSchema
 
 user_router = APIRouter(prefix="/users", tags=["👥 Users"])
 
 
-@user_router.get("/me")
-def get_me(user: CurrentUserDI) -> UserReadSchema:
+@user_router.get(
+    "/me",
+    tags=["👤 me"],
+    response_model=UserReadSchema,
+)
+def get_self(user: CurrentUserDI) -> UserReadSchema:
     return user
 
 
+@user_router.patch(
+    "/me",
+    tags=["👤 me"],
+    response_model=UserReadSchema,
+)
+async def update_self(
+    user_service: UserServiceDI,
+    user: CurrentUserDI,
+    update_user: UserUpdateSchema,
+) -> UserReadSchema:
+    try:
+        user = await user_service.update_user(user.id, update_user)
+    except UserUknownException:
+        raise UserUknownError
+    return user
+
+
+@user_router.put(
+    path="/me",
+    tags=["👤 me"],
+    response_model=UserReadSchema,
+)
+async def update_self_username(
+    user_service: UserServiceDI,
+    current_user: CurrentUserDI,
+    new_username: str,
+) -> UserReadSchema:
+    try:
+        user_read = await user_service.change_username(current_user.id, new_username)
+        return user_read
+    except UserAlredyExistsException as e:
+        raise UserAlreadyExistsError(e)
+    except UserUknownException as e:
+        raise UserUknownError(e)
+
+
 @user_router.get(
-    path="/{user_id}", response_model=UserReadSchema, dependencies=[AuthRequiredDI]
+    path="/{user_id}",
+    dependencies=[AuthRequiredDI],
+    response_model=UserReadSchema,
 )
 async def get_user_by_id(
     user_service: UserServiceDI, user_id: Annotated[PositiveInt, Path()]
@@ -41,9 +83,11 @@ async def get_user_by_id(
 
 
 @user_router.put(
-    path="/{user_id}", response_model=UserReadSchema, dependencies=[AdminRequiredDI]
+    path="/{user_id}",
+    dependencies=[AdminRequiredDI],
+    response_model=UserReadSchema,
 )
-async def update_username(
+async def update_username_by_id(
     user_service: UserServiceDI, user_id: Annotated[int, Path()], new_username: str
 ) -> UserReadSchema:
     try:

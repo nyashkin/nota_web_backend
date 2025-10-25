@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from starlette import status
 
 from src.auth.enums import AuthUrls, TokenType
-from src.auth.exceptions.http import InvalidJwtTokenTypeError
+from src.auth.exceptions.http import InvalidJwtTokenTypeError, NotAuthenticatedError
 from src.auth.services import AuthService, CryptoService
 from src.core.exceptions.http import BaseHTTPException
 from src.entities.user.dependencies import UserServiceDI
@@ -14,7 +14,6 @@ from src.entities.user.exceptions.domain import (
     UserNotFoundException,
     UserUknownException,
 )
-from src.entities.user.exceptions.http import UserNotFoundError, UserUknownError
 from src.entities.user.schemas import UserReadSchema
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -32,10 +31,10 @@ async def get_current_user(
         raise InvalidJwtTokenTypeError
     try:
         user = await user_service.get_user_by_id(int(payload.sub))
-    except UserNotFoundException as e:
-        raise UserNotFoundError(e)
+    except UserNotFoundException:
+        raise NotAuthenticatedError
     except UserUknownException:
-        raise UserUknownError
+        raise NotAuthenticatedError
     return user
 
 
@@ -46,7 +45,7 @@ CurrentUserDI = Annotated[UserReadSchema, AuthRequiredDI]
 
 async def check_admin_access(current_user: CurrentUserDI) -> UserReadSchema:
     if current_user.role != UserRole.ADMIN:
-        raise BaseHTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise BaseHTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return current_user
 
 
@@ -55,7 +54,7 @@ AdminRequiredDI = Depends(check_admin_access)
 
 async def check_user_access(current_user: CurrentUserDI) -> UserReadSchema:
     if current_user.role != UserRole.USER:
-        raise BaseHTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise BaseHTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return current_user
 
 
