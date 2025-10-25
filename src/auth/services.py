@@ -1,0 +1,130 @@
+import jwt
+from loguru import logger
+from uuid import uuid4
+from src.auth.enums import TokenType
+from src.auth.exceptions.domain import (
+    InvalidJwtTokenException,
+    JwtTokenExpiredException,
+    PasswordOrUsernameInvalidException,
+)
+from src.auth.schemas import AuthTokenRead, TokenPayloadSchema, TokenRead
+from src.auth.utils import hash_password, check_password
+from src.entities.user.exceptions.domain import (
+    UserAlredyExistsException,
+    UserByUsernameNotFoundException,
+    UserUknownException,
+)
+from src.entities.user.schemas import UserReadSchema, UserCreateSchema
+from src.core.database.dependencies import UoWDI
+from src.core import config
+from datetime import datetime, timezone, timedelta
+
+
+class CryptoService:
+    public_key: str = config.auth.public_key
+    private_key: str = config.auth.private_key
+    access_token_expire_hours = config.auth.access_token_expire_hours
+    refresh_token_expire_days = config.auth.refresh_token_expire_days
+    alg = config.auth.algorithm
+
+    @classmethod
+    def encode_refresh_token(cls, user: UserReadSchema) -> str:
+        datetime_now = datetime.now(timezone.utc)
+        now_unix = int(datetime_now.timestamp())
+
+        refresh_datetime_exp = datetime_now + timedelta(
+            days=cls.refresh_token_expire_days
+        )
+
+        exp_refresh_unix: int = int(refresh_datetime_exp.timestamp())
+
+        refresh_payload = TokenPayloadSchema(
+            sub=str(user.id),
+            jti=str(uuid4()),
+            iat=now_unix,
+            exp=exp_refresh_unix,
+            nbf=now_unix,
+            type=TokenType.REFRESH,
+        )
+
+        return jwt.encode(
+            payload=refresh_payload.model_dump(), key=cls.private_key, algorithm=cls.alg
+        )
+
+    @classmethod
+    def encode_access_token(cls, user: UserReadSchema) -> str:
+        datetime_now = datetime.now(timezone.utc)
+        access_datetime_exp = datetime_now + timedelta(
+            hours=cls.access_token_expire_hours
+        )
+
+        now_unix: int = int(datetime_now.timestamp())
+        exp_access_unix: int = int(access_datetime_exp.timestamp())
+
+        access_payload = TokenPayloadSchema(
+            sub=str(user.id),
+            jti=str(uuid4()),
+            iat=now_unix,
+            exp=exp_access_unix,
+            nbf=now_unix,
+            type=TokenType.ACCESS,
+        )
+
+        return jwt.encode(
+            payload=access_payload.model_dump(), key=cls.private_key, algorithm=cls.alg
+        )
+
+    @classmethod
+    def get_payload(cls, jwt_str: str) -> TokenPayloadSchema:
+        try:
+            payload = TokenPayloadSchema.model_validate(
+                jwt.decode(
+                    jwt=jwt_str,
+                    key=cls.public_key,
+                    algorithms=[
+                        cls.alg,
+                    ],
+                )
+            )
+            return payload
+        except jwt.ExpiredSignatureError:
+            raise JwtTokenExpiredException
+        except jwt.PyJWTError as e:
+            logger.error(e)
+            raise InvalidJwtTokenException
+
+
+class AuthService:
+    def __init__(self, uow: UoWDI) -> None:
+        self._uow = uow
+
+    async def register_user(self, create_user: UserCreateSchema) -> UserReadSchema:
+        create_user.password = hash_password(create_user.password)
+        try:
+            new_user = await self._uow.users.create_user(create_user)
+        except (UserAlredyExistsException, UserUknownException):
+            raise
+        return new_user
+
+    async def login_user(self, username: str, password: str) -> TokenRead:
+        try:
+            password_hash_from_db = await self._uow.users.get_password_hash_by_username(
+                username
+            )
+        except (UserByUsernameNotFoundException, UserUknownException):
+            raise
+
+        if check_password(password, password_hash_from_db):
+            user = await self._uow.users.get_user_by_username(username)
+            return TokenRead(
+                access_token=CryptoService.encode_access_token(user),
+                refresh_token=CryptoService.encode_refresh_token(user),
+            )
+
+        raise PasswordOrUsernameInvalidException
+
+    async def refresh_token(self, refresh_token: str) -> AuthTokenRead:
+        user_payload = CryptoService.get_payload(refresh_token)
+        user = await self._uow.users.get_user_by_id(int(user_payload.sub))
+        access_token = CryptoService.encode_access_token(user)
+        return AuthTokenRead(access_token=access_token)

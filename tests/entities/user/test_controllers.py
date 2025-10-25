@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from src.entities.user.schemas import UserReadSchema, UserSchemaCreate
+from src.entities.user.schemas import UserReadSchema, UserCreateSchema
 from src.entities.user.enums import UserRole
 
 
@@ -12,7 +12,7 @@ def shared_data():
 
 class TestUserControllers:
     def test_create_user(self, client: TestClient, shared_data: dict):
-        create_user_schema = UserSchemaCreate(
+        create_user_schema = UserCreateSchema(
             username="user",
             password="secret_password",
             role=UserRole.USER,

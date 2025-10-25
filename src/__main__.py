@@ -1,10 +1,14 @@
-from src.entities.user.controllers import router as user_router
+from src.auth.controllers import auth_router
+from src.entities.user.controllers import user_router
 from fastapi import FastAPI
 import uvicorn
 
 
 def include_routers(app: FastAPI):
-    routers = (user_router,)
+    routers = (
+        auth_router,
+        user_router,
+    )
     for router in routers:
         app.include_router(router)
 

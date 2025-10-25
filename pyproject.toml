@@ -3,21 +3,22 @@ name = "nota-web-backend"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.17.0",
     "asyncpg>=0.30.0",
+    "bcrypt>=5.0.0",
     "dotenv>=0.9.9",
-    "fastapi[all]>=0.119.0",
+    "fastapi[all,standard]>=0.119.0",
     "loguru>=0.7.3",
     "psycopg2-binary>=2.9.11",
     "pydantic-settings>=2.11.0",
+    "pyjwt[crypto]>=2.10.1",
     "sqlalchemy[asyncio]>=2.0.44",
 ]
 
 [dependency-groups]
 dev = [
-    "aiosqlite>=0.21.0",
     "mypy>=1.18.2",
     "pylance>=0.38.2",
     "pytest>=8.4.2",
@@ -28,3 +29,6 @@ dev = [
 
 [tool.mypy]
 plugins = ['pydantic.mypy']
+
+[tool.ruff.lint]
+select = ["I"]
