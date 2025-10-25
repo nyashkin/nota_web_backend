@@ -1,4 +1,20 @@
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${API_HOST}:${API_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - backend-network
+    restart: unless-stopped
   database:
     image: postgres:17-alpine
     hostname: database
