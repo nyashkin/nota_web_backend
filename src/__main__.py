@@ -3,6 +3,7 @@ from fastapi import FastAPI
 
 from src.auth.controllers import auth_router
 from src.entities.user.controllers import user_router
+from src.core import config
 
 
 def include_routers(app: FastAPI):
@@ -15,7 +16,10 @@ def include_routers(app: FastAPI):
 
 
 def get_app() -> FastAPI:
-    app = FastAPI(debug=True)
+    app = FastAPI(
+        title=config.api.title,
+        debug=config.api.debug,
+    )
     include_routers(app)
     return app
 
@@ -23,4 +27,8 @@ def get_app() -> FastAPI:
 app = get_app()
 
 if __name__ == "__main__":
-    uvicorn.run("src.__main__:app")
+    uvicorn.run(
+        "src.__main__:app",
+        port=config.api.port,
+        host=config.api.host,
+    )
