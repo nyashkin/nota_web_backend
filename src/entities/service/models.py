@@ -10,7 +10,7 @@ from src.entities.service_category.models import ServiceCategoryOrm
 
 class ServiceOrm(BaseOrm, IdMixin, TimestampMixin):
     __tablename__ = "services"
-    title: Mapped[str] = mapped_column(String(20), unique=True)
+    title: Mapped[str] = mapped_column(String(128), unique=True)
     description: Mapped[str] = mapped_column(String(256), nullable=False)
     price: Mapped[Decimal] = mapped_column(
         Numeric(precision=12, scale=2), nullable=False
