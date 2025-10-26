@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from starlette import status
+
 from src.auth.controllers import auth_router
 from src.core import config
 from src.entities.user.controllers import user_router

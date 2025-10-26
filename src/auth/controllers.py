@@ -10,7 +10,11 @@ from src.auth.exceptions.domain import (
     InvalidJwtTokenException,
     JwtTokenExpiredException,
 )
-from src.auth.exceptions.http import InvalidJwtTokenError, JwtTokenExpiredError
+from src.auth.exceptions.http import (
+    InvalidJwtTokenError,
+    JwtTokenExpiredError,
+    NotAuthenticatedError,
+)
 from src.auth.schemas import AuthTokenRead
 from src.core import config
 from src.entities.user.exceptions.domain import (
@@ -21,7 +25,6 @@ from src.entities.user.exceptions.domain import (
 )
 from src.entities.user.exceptions.http import (
     UserAlreadyExistsError,
-    UserByUsernameNotFoundError,
     UserNotFoundError,
     UserUknownError,
 )
@@ -41,7 +44,7 @@ async def login(
             username=creds.username, password=creds.password
         )
     except UserByUsernameNotFoundException:
-        raise UserByUsernameNotFoundError
+        raise NotAuthenticatedError
     except UserUknownException:
         raise UserUknownError
 
@@ -60,7 +63,7 @@ async def login(
     return AuthTokenRead(access_token=token_read.access_token)
 
 
-@auth_router.post("/logout", response_model=AuthTokenRead)
+@auth_router.post("/logout")
 async def logout(
     response: Response,
 ) -> dict[str, str]:
