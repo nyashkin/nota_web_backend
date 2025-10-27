@@ -7,8 +7,19 @@ dev-up:
     uv run python -m src
 
 [group('DEV')]
+up:
+    just up-db
+    just up-api
+
+[group('DEV')]
+up-api:
+    uv run python -m src
+
+[group('DEV')]
 up-db:
     docker compose up database -d
+    sleep 2
+    alembic upgrade head
 
 [group('DEV')]
 dev-down:
