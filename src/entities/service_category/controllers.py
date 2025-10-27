@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import PositiveInt
 from starlette import status
 
+from src.auth.dependencies import AuthRequiredDI
 from src.entities.service_category.dependencies import ServiceCategoryServiceDI
 from src.entities.service_category.exceptions.domain import (
     ServiceCategoryCreateException,
@@ -29,8 +30,9 @@ service_categories_router = APIRouter(
 
 @service_categories_router.post(
     "/",
-    status_code=status.HTTP_201_CREATED,
+    dependencies=[AuthRequiredDI],
     response_model=ServiceCategoryReadSchema,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_service_category(
     service_categories_service: ServiceCategoryServiceDI,
@@ -60,6 +62,7 @@ async def get_all_categories(
 
 @service_categories_router.patch(
     "/",
+    dependencies=[AuthRequiredDI],
     response_model=ServiceCategoryReadSchema,
 )
 async def update_service_category(
@@ -84,6 +87,7 @@ async def update_service_category(
 
 @service_categories_router.delete(
     "/",
+    dependencies=[AuthRequiredDI],
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_service_category(
