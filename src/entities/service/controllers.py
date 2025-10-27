@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import PositiveInt
 from starlette import status
 
+from src.auth.dependencies import AuthRequiredDI
 from src.entities.service.dependencies import ServiceServiceDI
 from src.entities.service.exceptions.domain import (
     NotUniqueServiceTitleException,
@@ -20,7 +21,9 @@ from src.entities.service.schemas import (
 services_router = APIRouter(prefix="/services", tags=["Services"])
 
 
-@services_router.post("/", status_code=status.HTTP_201_CREATED)
+@services_router.post(
+    "/", status_code=status.HTTP_201_CREATED, dependencies=[AuthRequiredDI]
+)
 async def create_service(
     service_service: ServiceServiceDI,
     service_create: ServiceCreateSchema,
@@ -44,7 +47,7 @@ async def get_service(
     return service_read
 
 
-@services_router.patch("/")
+@services_router.patch("/", dependencies=[AuthRequiredDI])
 async def update_service(
     service_service: ServiceServiceDI,
     service_id: PositiveInt,
@@ -62,7 +65,11 @@ async def update_service(
     return service_read
 
 
-@services_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+@services_router.delete(
+    "/",
+    dependencies=[AuthRequiredDI],
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def delete_service(
     service_service: ServiceServiceDI,
     service_id: PositiveInt,
