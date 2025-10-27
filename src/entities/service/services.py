@@ -25,7 +25,10 @@ class ServiceService:
     async def update_service(
         self, service_id: int, service_update: ServiceUpdateSchema
     ) -> ServiceReadSchema:
-        return await self._uow.services.update_service(service_id, service_update)
+        return await self._uow.services.update_service(
+            service_id,
+            service_update,
+        )
 
     async def delete_service(self, service_id: int) -> None:
         return await self._uow.services.delete_service(service_id)
