@@ -7,3 +7,4 @@ class ApiConfig(BaseSettings, env_prefix="API_"):
     port: PositiveInt
     host: str
     debug: bool
+    cors_origins: list[str]

@@ -1,18 +1,31 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
+
 from src.auth.controllers import auth_router
 from src.core import config
+from src.entities.service.controllers import services_router
+from src.entities.service_category.controllers import service_categories_router
 from src.entities.user.controllers import user_router
 
 
 def include_routers(app: FastAPI):
-    routers = (
-        auth_router,
-        user_router,
-    )
+    routers = (auth_router, user_router, service_categories_router, services_router)
     for router in routers:
         app.include_router(router)
+
+
+def set_middlewares(app: FastAPI):
+    origins = config.api.cors_origins
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 def get_app() -> FastAPI:
@@ -20,6 +33,7 @@ def get_app() -> FastAPI:
         title=config.api.title,
         debug=config.api.debug,
     )
+    set_middlewares(app)
     include_routers(app)
     return app
 
