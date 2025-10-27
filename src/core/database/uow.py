@@ -3,6 +3,7 @@ from typing import Self
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from src.entities.service.repository import ServiceRepository
 from src.entities.service_category.repository import ServiceCategoryRepository
 from src.entities.user.repository import UserRepository
 
@@ -15,6 +16,7 @@ class UoW:
         self._session = self._session_factory()
         self.users = UserRepository(self._session)
         self.service_categories = ServiceCategoryRepository(self._session)
+        self.services = ServiceRepository(self._session)
         return self
 
     async def __aexit__(
