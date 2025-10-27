@@ -2,6 +2,7 @@ from loguru import logger
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.entities.service.exceptions.domain import (
     NotUniqueServiceTitleException,
@@ -27,7 +28,7 @@ class ServiceRepository:
             service_orm = ServiceOrm(**create_service.model_dump())
             self._session.add(service_orm)
             await self._session.flush()
-            await self._session.refresh(service_orm)
+            await self._session.refresh(service_orm, attribute_names=["category"])
             await self._session.commit()
         except IntegrityError:
             raise NotUniqueServiceTitleException(create_service.title)
@@ -70,7 +71,11 @@ class ServiceRepository:
         await self._session.execute(delete(ServiceOrm).where(ServiceOrm.id == id))
 
     async def _get_service_orm_by_id(self, id: int) -> ServiceOrm:
-        query = select(ServiceOrm).where(ServiceOrm.id == id)
+        query = (
+            select(ServiceOrm)
+            .where(ServiceOrm.id == id)
+            .options(selectinload(ServiceOrm.category))
+        )
         service_orm: ServiceOrm | None = (
             await self._session.execute(query)
         ).scalar_one_or_none()

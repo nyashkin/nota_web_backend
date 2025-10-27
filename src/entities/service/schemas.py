@@ -12,7 +12,6 @@ class ServiceUpdateSchema(BaseAppSchema):
     description: str = Field(min_length=8, max_length=256)
     price: Decimal
     category_id: int
-    category: ServiceCategoryReadSchema | None
 
 
 class ServiceCreateSchema(ServiceUpdateSchema):
@@ -23,3 +22,4 @@ class ServiceReadSchema(ServiceUpdateSchema):
     id: int
     created_at: datetime
     updated_at: datetime
+    category: ServiceCategoryReadSchema | None
