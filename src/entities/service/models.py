@@ -21,5 +21,5 @@ class ServiceOrm(BaseOrm, IdMixin, TimestampMixin):
     )
 
     category: Mapped[ServiceCategoryOrm] = relationship(
-        "ServiceCategory", backref="services"
+        "ServiceCategoryOrm", backref="services"
     )
