@@ -62,6 +62,7 @@ class ServiceRepository:
             for attr, val in update_service.model_dump(exclude_none=True).items():
                 setattr(service_orm, attr, val)
             await self._session.flush()
+            await self._session.refresh(service_orm, attribute_names=["category"])
             await self._session.commit()
         except IntegrityError:
             raise NotUniqueServiceTitleException(update_service.title)

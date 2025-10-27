@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import Field, PositiveInt
 
 from src.core.schemas import BaseAppSchema
@@ -14,3 +16,5 @@ class ServiceCategoryCreateShema(ServiceCategoryUpdateShema):
 
 class ServiceCategoryReadSchema(ServiceCategoryCreateShema):
     id: int
+    created_at: datetime
+    updated_at: datetime
