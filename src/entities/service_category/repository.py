@@ -8,6 +8,9 @@ from src.entities.service_category.exceptions.domain import (
     ServiceCategoryNotFoundException,
     ServiceCategoryUknownException,
 )
+from src.entities.service_category.exceptions.http import (
+    ServiceCategoryIdAndParentIdCannotBeEqualError,
+)
 from src.entities.service_category.models import ServiceCategoryOrm
 from src.entities.service_category.schemas import (
     ServiceCategoryCreateShema,
@@ -28,6 +31,8 @@ class ServiceCategoryRepository:
         try:
             await self._session.flush()
             await self._session.refresh(category_orm)
+            if category_orm.id == category_orm.parent_id:
+                raise ServiceCategoryIdAndParentIdCannotBeEqualError
             await self._session.commit()
         except IntegrityError:
             raise ServiceCategoryCreateException
@@ -44,6 +49,9 @@ class ServiceCategoryRepository:
             for key, val in update_category.model_dump().items():
                 category_orm.__setattr__(key, val)
             await self._session.flush()
+            await self._session.refresh(category_orm)
+            if category_orm.id == category_orm.parent_id:
+                raise ServiceCategoryIdAndParentIdCannotBeEqualError
             await self._session.commit()
         except IntegrityError:
             raise ServiceCategoryCreateException

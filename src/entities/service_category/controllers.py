@@ -5,10 +5,12 @@ from starlette import status
 from src.entities.service_category.dependencies import ServiceCategoryServiceDI
 from src.entities.service_category.exceptions.domain import (
     ServiceCategoryCreateException,
+    ServiceCategoryIdAndParentIdCannotBeEqualException,
     ServiceCategoryNotFoundException,
     ServiceCategoryUknownException,
 )
 from src.entities.service_category.exceptions.http import (
+    ServiceCategoryIdAndParentIdCannotBeEqualError,
     ServiceCategoryNameNotUniqueError,
     ServiceCategoryNotFoundError,
     ServiceCategoryUknownError,
@@ -38,6 +40,8 @@ async def create_service_category(
         new_category = await service_categories_service.create_category(create_category)
     except ServiceCategoryCreateException:
         raise ServiceCategoryNameNotUniqueError
+    except ServiceCategoryIdAndParentIdCannotBeEqualError:
+        raise ServiceCategoryIdAndParentIdCannotBeEqualException
     except ServiceCategoryUknownException:
         raise ServiceCategoryUknownError
     return new_category
@@ -71,6 +75,8 @@ async def update_service_category(
         raise ServiceCategoryNotFoundError
     except ServiceCategoryCreateException:
         raise ServiceCategoryNameNotUniqueError
+    except ServiceCategoryIdAndParentIdCannotBeEqualError:
+        raise ServiceCategoryIdAndParentIdCannotBeEqualException
     except ServiceCategoryUknownException:
         raise ServiceCategoryUknownError
     return updated_category

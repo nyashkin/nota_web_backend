@@ -26,3 +26,12 @@ class ServiceCategoryUknownError(BaseHTTPException):
             "Service category uknown Exception",
             None,
         )
+
+
+class ServiceCategoryIdAndParentIdCannotBeEqualError(BaseHTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            "Service category id and parent id cannot be equal exception",
+            None,
+        )
