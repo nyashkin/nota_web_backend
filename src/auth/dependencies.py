@@ -5,14 +5,16 @@ from fastapi.security import OAuth2PasswordBearer
 from starlette import status
 
 from src.auth.enums import AuthUrls, TokenType
-from src.auth.exceptions.http import InvalidJwtTokenTypeError, NotAuthenticatedError
+from src.auth.exceptions.http import (
+    InvalidJwtTokenTypeHTTPException,
+    NotAuthenticatedHTTPException,
+)
 from src.auth.services import AuthService, CryptoService
 from src.core.exceptions.http import BaseHTTPException
 from src.entities.user.dependencies import UserServiceDI
 from src.entities.user.enums import UserRole
 from src.entities.user.exceptions.domain import (
     UserNotFoundException,
-    UserUknownException,
 )
 from src.entities.user.schemas import UserReadSchema
 
@@ -28,13 +30,11 @@ async def get_current_user(
 ) -> UserReadSchema:
     payload = CryptoService.get_payload(token)
     if payload.type == TokenType.REFRESH:
-        raise InvalidJwtTokenTypeError
+        raise InvalidJwtTokenTypeHTTPException
     try:
         user = await user_service.get_user_by_id(int(payload.sub))
     except UserNotFoundException:
-        raise NotAuthenticatedError
-    except UserUknownException:
-        raise NotAuthenticatedError
+        raise NotAuthenticatedHTTPException
     return user
 
 

@@ -3,22 +3,22 @@ from fastapi import status
 from src.core.exceptions.http import BaseHTTPException
 
 
-class JwtTokenExpiredError(BaseHTTPException):
+class JwtTokenExpiredHTTPException(BaseHTTPException):
     def __init__(self) -> None:
         super().__init__(status.HTTP_400_BAD_REQUEST, "Jwt token expired", None)
 
 
-class InvalidJwtTokenError(BaseHTTPException):
+class InvalidJwtTokenHTTPException(BaseHTTPException):
     def __init__(self) -> None:
         super().__init__(status.HTTP_400_BAD_REQUEST, "Invalid jwt token", None)
 
 
-class InvalidJwtTokenTypeError(BaseHTTPException):
+class InvalidJwtTokenTypeHTTPException(BaseHTTPException):
     def __init__(self) -> None:
         super().__init__(status.HTTP_400_BAD_REQUEST, "Invalid jwt token type", None)
 
 
-class NotAuthenticatedError(BaseHTTPException):
+class NotAuthenticatedHTTPException(BaseHTTPException):
     def __init__(self) -> None:
         super().__init__(
             status.HTTP_401_UNAUTHORIZED,
