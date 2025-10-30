@@ -1,15 +1,13 @@
-from loguru import logger
 from sqlalchemy import delete, select
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.entities.service_category.exceptions.domain import (
     ServiceCategoryCreateException,
     ServiceCategoryNotFoundException,
-    ServiceCategoryUknownException,
 )
 from src.entities.service_category.exceptions.http import (
-    ServiceCategoryIdAndParentIdCannotBeEqualError,
+    ServiceCategoryIdAndParentIdCannotBeEqualHTTPError,
 )
 from src.entities.service_category.models import ServiceCategoryOrm
 from src.entities.service_category.schemas import (
@@ -32,13 +30,10 @@ class ServiceCategoryRepository:
             await self._session.flush()
             await self._session.refresh(category_orm)
             if category_orm.id == category_orm.parent_id:
-                raise ServiceCategoryIdAndParentIdCannotBeEqualError
+                raise ServiceCategoryIdAndParentIdCannotBeEqualHTTPError
             await self._session.commit()
         except IntegrityError:
             raise ServiceCategoryCreateException
-        except SQLAlchemyError as e:
-            logger.error(e)
-            raise ServiceCategoryUknownException
         return ServiceCategoryReadSchema.model_validate(category_orm)
 
     async def update_category(
@@ -51,22 +46,15 @@ class ServiceCategoryRepository:
             await self._session.flush()
             await self._session.refresh(category_orm)
             if category_orm.id == category_orm.parent_id:
-                raise ServiceCategoryIdAndParentIdCannotBeEqualError
+                raise ServiceCategoryIdAndParentIdCannotBeEqualHTTPError
             await self._session.commit()
         except IntegrityError:
             raise ServiceCategoryCreateException
-        except SQLAlchemyError as e:
-            logger.error(e)
-            raise ServiceCategoryUknownException
         return ServiceCategoryReadSchema.model_validate(category_orm)
 
     async def delete_category(self, id: int):
         stmt = delete(ServiceCategoryOrm).where(ServiceCategoryOrm.id == id)
-        try:
-            await self._session.execute(stmt)
-        except SQLAlchemyError as e:
-            logger.error(e)
-            raise ServiceCategoryUknownException
+        await self._session.execute(stmt)
 
     async def get_category_by_id(self, id: int) -> ServiceCategoryReadSchema:
         category_orm: ServiceCategoryOrm | None = await self._get_category_orm_by_id(id)
@@ -82,16 +70,12 @@ class ServiceCategoryRepository:
         return category_orm
 
     async def get_all(self) -> list[ServiceCategoryReadSchema]:
-        try:
-            query = select(ServiceCategoryOrm)
-            category_orms: list[ServiceCategoryOrm] = list(
-                (await self._session.execute(query)).scalars().all()
-            )
-            category_reads = [
-                ServiceCategoryReadSchema.model_validate(category_orm)
-                for category_orm in category_orms
-            ]
-        except SQLAlchemyError as e:
-            logger.error(e)
-            raise ServiceCategoryUknownException
+        query = select(ServiceCategoryOrm)
+        category_orms: list[ServiceCategoryOrm] = list(
+            (await self._session.execute(query)).scalars().all()
+        )
+        category_reads = [
+            ServiceCategoryReadSchema.model_validate(category_orm)
+            for category_orm in category_orms
+        ]
         return category_reads
