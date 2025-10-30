@@ -1,13 +1,11 @@
-from loguru import logger
 from sqlalchemy import delete, select
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.entities.service.exceptions.domain import (
     NotUniqueServiceTitleException,
     ServiceNotFoundException,
-    UknownServiceException,
 )
 from src.entities.service.models import ServiceOrm
 from src.entities.service.schemas import (
@@ -40,13 +38,9 @@ class ServiceRepository:
 
     async def get_all(self) -> list[ServiceReadSchema]:
         query = select(ServiceOrm)
-        try:
-            all_services_orms: list[ServiceOrm] = list(
-                (await self._session.execute(query)).scalars().all()
-            )
-        except SQLAlchemyError as e:
-            logger.error(e)
-            raise UknownServiceException
+        all_services_orms: list[ServiceOrm] = list(
+            (await self._session.execute(query)).scalars().all()
+        )
 
         all_services_read = [
             ServiceReadSchema.model_validate(service_orm)
