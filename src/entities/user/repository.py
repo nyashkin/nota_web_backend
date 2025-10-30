@@ -1,12 +1,10 @@
 from sqlalchemy import select, update
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.entities.user.exceptions.domain import (
-    UserAlredyExistsException,
-    UserByUsernameNotFoundException,
+    UsernameAlredyExistsException,
     UserNotFoundException,
-    UserUknownException,
 )
 from src.entities.user.models import UserOrm
 from src.entities.user.schemas import UserCreateSchema, UserReadSchema, UserUpdateSchema
@@ -23,9 +21,7 @@ class UserRepository:
             await self._session.commit()
             await self._session.refresh(user)
         except IntegrityError:
-            raise UserAlredyExistsException(user_create.username)
-        except Exception:
-            raise UserUknownException
+            raise UsernameAlredyExistsException(user_create.username)
         return UserReadSchema.model_validate(user)
 
     async def get_user_by_id(self, id: int) -> UserReadSchema:
@@ -49,9 +45,7 @@ class UserRepository:
             await self._session.commit()
             return UserReadSchema.model_validate(user)
         except IntegrityError:
-            raise UserAlredyExistsException(username)
-        except Exception as e:
-            raise UserUknownException(e)
+            raise UsernameAlredyExistsException(username)
 
     async def update_user(
         self,
@@ -59,33 +53,24 @@ class UserRepository:
         update_user: UserUpdateSchema,
     ) -> UserReadSchema:
         stmt = update(UserOrm).where(UserOrm.id == id).values(update_user.model_dump())
-        try:
-            await self._session.execute(stmt)
-            user_orm = await self._get_user_model_by_id(id)
-        except (SQLAlchemyError, UserUknownException):
-            raise UserUknownException
+        await self._session.execute(stmt)
+        user_orm = await self._get_user_model_by_id(id)
         return UserReadSchema.model_validate(user_orm)
 
     async def _get_user_model_by_id(self, id: int) -> UserOrm:
         query = select(UserOrm).where(UserOrm.id == id)
-        try:
-            user_orm: UserOrm | None = (
-                await self._session.execute(query)
-            ).scalar_one_or_none()
-            if not user_orm:
-                raise UserNotFoundException(id)
-        except SQLAlchemyError:
-            raise UserUknownException
+        user_orm: UserOrm | None = (
+            await self._session.execute(query)
+        ).scalar_one_or_none()
+        if not user_orm:
+            raise UserNotFoundException(id)
         return user_orm
 
     async def _get_user_model_by_username(self, username: str) -> UserOrm:
         query = select(UserOrm).where(UserOrm.username == username)
-        try:
-            user_orm: UserOrm | None = (
-                await self._session.execute(query)
-            ).scalar_one_or_none()
-            if not user_orm:
-                raise UserByUsernameNotFoundException(username)
-        except SQLAlchemyError:
-            raise UserUknownException
+        user_orm: UserOrm | None = (
+            await self._session.execute(query)
+        ).scalar_one_or_none()
+        if not user_orm:
+            raise UserNotFoundException
         return user_orm

@@ -1,41 +1,14 @@
 from src.core.exceptions.domain import BaseDomainException
-from src.entities.user.schemas import UserUpdateSchema
 
 
-class BaseUserException(BaseDomainException):
-    def __init__(self, user: UserUpdateSchema):
-        self.user = user
-
-
-class UserNotFoundException(BaseUserException):
-    def __init__(self, user_id: int):
-        self.user_id = user_id
-
+class UserNotFoundException(BaseDomainException):
     def __str__(self) -> str:
-        return f"User with id {self.user_id} not found"
+        return "User not found"
 
 
-class UserByUsernameNotFoundException(BaseUserException):
-    def __init__(self, username: str):
-        self.username = username
-
-    def __str__(self) -> str:
-        return f"User with username {self.username} not found"
-
-
-class UserAlredyExistsException(BaseUserException):
+class UsernameAlredyExistsException(BaseDomainException):
     def __init__(self, username: str):
         self.username = username
 
     def __str__(self) -> str:
         return f"User with username {self.username} already exists"
-
-
-class UserUknownException(BaseUserException):
-    def __init__(self, exc: BaseException | None = None):
-        self.exc = exc
-
-    def __str__(self) -> str:
-        if self.exc:
-            return f"User uknown exception: {self.exc}"
-        return "User uknown exception"

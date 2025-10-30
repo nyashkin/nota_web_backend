@@ -5,16 +5,6 @@ from pydantic import PositiveInt
 
 from src.auth.dependencies import AdminRequiredDI, AuthRequiredDI, CurrentUserDI
 from src.entities.user.dependencies import UserServiceDI
-from src.entities.user.exceptions.domain import (
-    UserAlredyExistsException,
-    UserNotFoundException,
-    UserUknownException,
-)
-from src.entities.user.exceptions.http import (
-    UserAlreadyExistsError,
-    UserNotFoundError,
-    UserUknownError,
-)
 from src.entities.user.schemas import UserReadSchema, UserUpdateSchema
 
 user_router = APIRouter(prefix="/users", tags=["👥 Users"])
@@ -39,11 +29,7 @@ async def update_self(
     user: CurrentUserDI,
     update_user: UserUpdateSchema,
 ) -> UserReadSchema:
-    try:
-        user = await user_service.update_user(user.id, update_user)
-    except UserUknownException:
-        raise UserUknownError
-    return user
+    return await user_service.update_user(user.id, update_user)
 
 
 @user_router.put(
@@ -56,13 +42,7 @@ async def update_self_username(
     current_user: CurrentUserDI,
     new_username: str,
 ) -> UserReadSchema:
-    try:
-        user_read = await user_service.change_username(current_user.id, new_username)
-        return user_read
-    except UserAlredyExistsException as e:
-        raise UserAlreadyExistsError(e)
-    except UserUknownException as e:
-        raise UserUknownError(e)
+    return await user_service.change_username(current_user.id, new_username)
 
 
 @user_router.get(
@@ -73,13 +53,7 @@ async def update_self_username(
 async def get_user_by_id(
     user_service: UserServiceDI, user_id: Annotated[PositiveInt, Path()]
 ) -> UserReadSchema:
-    try:
-        user_read = await user_service.get_user_by_id(user_id)
-        return user_read
-    except UserNotFoundException as e:
-        raise UserNotFoundError(e)
-    except UserUknownException:
-        raise UserUknownError
+    return await user_service.get_user_by_id(user_id)
 
 
 @user_router.put(
@@ -90,10 +64,4 @@ async def get_user_by_id(
 async def update_username_by_id(
     user_service: UserServiceDI, user_id: Annotated[int, Path()], new_username: str
 ) -> UserReadSchema:
-    try:
-        user_read = await user_service.change_username(user_id, new_username)
-        return user_read
-    except UserAlredyExistsException as e:
-        raise UserAlreadyExistsError(e)
-    except UserUknownException as e:
-        raise UserUknownError(e)
+    return await user_service.change_username(user_id, new_username)
