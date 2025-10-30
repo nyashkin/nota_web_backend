@@ -15,8 +15,3 @@ class NotUniqueServiceTitleException(BaseDomainException):
 
     def __str__(self) -> str:
         return f"Service with title {self.title} already exists"
-
-
-class UknownServiceException(BaseDomainException):
-    def __str__(self) -> str:
-        return "Uknown service exception"
