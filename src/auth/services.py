@@ -14,11 +14,6 @@ from src.auth.schemas import AuthTokenRead, TokenPayloadSchema, TokenRead
 from src.auth.utils import check_password, hash_password
 from src.core import config
 from src.core.database.dependencies import UoWDI
-from src.entities.user.exceptions.domain import (
-    UserAlredyExistsException,
-    UserByUsernameNotFoundException,
-    UserUknownException,
-)
 from src.entities.user.schemas import UserCreateSchema, UserReadSchema
 
 
@@ -102,19 +97,13 @@ class AuthService:
 
     async def register_user(self, create_user: UserCreateSchema) -> UserReadSchema:
         create_user.password = hash_password(create_user.password)
-        try:
-            new_user = await self._uow.users.create_user(create_user)
-        except (UserAlredyExistsException, UserUknownException):
-            raise
+        new_user = await self._uow.users.create_user(create_user)
         return new_user
 
     async def login_user(self, username: str, password: str) -> TokenRead:
-        try:
-            password_hash_from_db = await self._uow.users.get_password_hash_by_username(
-                username
-            )
-        except (UserByUsernameNotFoundException, UserUknownException):
-            raise
+        password_hash_from_db = await self._uow.users.get_password_hash_by_username(
+            username
+        )
 
         if check_password(password, password_hash_from_db):
             user = await self._uow.users.get_user_by_username(username)

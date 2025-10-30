@@ -6,28 +6,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from src.auth.dependencies import AuthServiceDI
 from src.auth.enums import AuthUrls
-from src.auth.exceptions.domain import (
-    InvalidJwtTokenException,
-    JwtTokenExpiredException,
-)
-from src.auth.exceptions.http import (
-    InvalidJwtTokenError,
-    JwtTokenExpiredError,
-    NotAuthenticatedError,
-)
 from src.auth.schemas import AuthTokenRead
 from src.core import config
-from src.entities.user.exceptions.domain import (
-    UserAlredyExistsException,
-    UserByUsernameNotFoundException,
-    UserNotFoundException,
-    UserUknownException,
-)
-from src.entities.user.exceptions.http import (
-    UserAlreadyExistsError,
-    UserNotFoundError,
-    UserUknownError,
-)
 from src.entities.user.schemas import UserCreateSchema, UserReadSchema
 
 auth_router = APIRouter(prefix="/auth", tags=["🔑 Auth"])
@@ -39,14 +19,9 @@ async def login(
     creds: Annotated[OAuth2PasswordRequestForm, Depends()],
     response: Response,
 ) -> AuthTokenRead:
-    try:
-        token_read = await auth_service.login_user(
-            username=creds.username, password=creds.password
-        )
-    except UserByUsernameNotFoundException:
-        raise NotAuthenticatedError
-    except UserUknownException:
-        raise UserUknownError
+    token_read = await auth_service.login_user(
+        username=creds.username, password=creds.password
+    )
 
     response.set_cookie(
         key="refresh_token",
@@ -81,28 +56,12 @@ async def logout(
 async def register(
     auth_service: AuthServiceDI, create_user: UserCreateSchema
 ) -> UserReadSchema:
-    try:
-        user = await auth_service.register_user(create_user)
-    except UserAlredyExistsException:
-        raise UserAlreadyExistsError
-    except UserUknownException:
-        raise UserUknownError
-
-    return user
+    return await auth_service.register_user(create_user)
 
 
 @auth_router.post("/refresh", response_model=AuthTokenRead)
 async def refresh(
     auth_service: AuthServiceDI, refresh_token: Annotated[str, Cookie()]
 ) -> AuthTokenRead:
-    try:
-        new_access_token = await auth_service.refresh_token(refresh_token)
-    except JwtTokenExpiredException:
-        raise JwtTokenExpiredError
-    except InvalidJwtTokenException:
-        raise InvalidJwtTokenError
-    except UserNotFoundException as e:
-        raise UserNotFoundError(e)
-    except UserUknownException:
-        raise UserUknownError
+    new_access_token = await auth_service.refresh_token(refresh_token)
     return new_access_token
