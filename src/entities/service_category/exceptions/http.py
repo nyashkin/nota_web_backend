@@ -3,14 +3,14 @@ from starlette import status
 from src.core.exceptions.http import BaseHTTPException
 
 
-class ServiceCategoryNotFoundError(BaseHTTPException):
+class ServiceCategoryNotFoundHTTPException(BaseHTTPException):
     def __init__(self) -> None:
         super().__init__(status.HTTP_404_NOT_FOUND, "Service category not found", None)
 
     pass
 
 
-class ServiceCategoryNameNotUniqueError(BaseHTTPException):
+class ServiceCategoryCreateHTTPException(BaseHTTPException):
     def __init__(self) -> None:
         super().__init__(
             status.HTTP_400_BAD_REQUEST,
@@ -19,16 +19,7 @@ class ServiceCategoryNameNotUniqueError(BaseHTTPException):
         )
 
 
-class ServiceCategoryUknownError(BaseHTTPException):
-    def __init__(self) -> None:
-        super().__init__(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            "Service category uknown Exception",
-            None,
-        )
-
-
-class ServiceCategoryIdAndParentIdCannotBeEqualError(BaseHTTPException):
+class ServiceCategoryIdAndParentIdCannotBeEqualHTTPError(BaseHTTPException):
     def __init__(self) -> None:
         super().__init__(
             status.HTTP_500_INTERNAL_SERVER_ERROR,

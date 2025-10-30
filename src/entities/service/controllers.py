@@ -9,8 +9,8 @@ from src.entities.service.exceptions.domain import (
     ServiceNotFoundException,
 )
 from src.entities.service.exceptions.http import (
-    NotUniqueServiceTitleError,
-    ServiceNotFoundError,
+    NotUniqueServiceTitleHTTPException,
+    ServiceNotFoundHTTPException,
 )
 from src.entities.service.schemas import (
     ServiceCreateSchema,
@@ -31,7 +31,7 @@ async def create_service(
     try:
         service_read = await service_service.create_service(service_create)
     except NotUniqueServiceTitleException:
-        raise NotUniqueServiceTitleError
+        raise NotUniqueServiceTitleHTTPException
     return service_read
 
 
@@ -43,7 +43,7 @@ async def get_service(
     try:
         service_read = await service_service.get_service_by_id(service_id)
     except ServiceNotFoundException:
-        raise ServiceNotFoundError
+        raise ServiceNotFoundHTTPException
     return service_read
 
 
@@ -59,9 +59,9 @@ async def update_service(
             service_update,
         )
     except ServiceNotFoundException:
-        raise ServiceNotFoundError
+        raise ServiceNotFoundHTTPException
     except NotUniqueServiceTitleException:
-        raise NotUniqueServiceTitleError
+        raise NotUniqueServiceTitleHTTPException
     return service_read
 
 
