@@ -5,9 +5,12 @@ from pydantic import PositiveInt
 
 from src.auth.dependencies import AdminRequiredDI, AuthRequiredDI, CurrentUserDI
 from src.entities.user.dependencies import UserServiceDI
+from src.entities.user.exception_handler import UserExceptionHandlerRoute
 from src.entities.user.schemas import UserReadSchema, UserUpdateSchema
 
-user_router = APIRouter(prefix="/users", tags=["👥 Users"])
+user_router = APIRouter(
+    prefix="/users", tags=["👥 Users"], route_class=UserExceptionHandlerRoute
+)
 
 
 @user_router.get(

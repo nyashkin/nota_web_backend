@@ -4,6 +4,7 @@ from starlette import status
 
 from src.auth.dependencies import AuthRequiredDI
 from src.entities.service.dependencies import ServiceServiceDI
+from src.entities.service.exception_handler import ServiceExceptionHandlerRoute
 from src.entities.service.exceptions.domain import (
     NotUniqueServiceTitleException,
     ServiceNotFoundException,
@@ -18,7 +19,11 @@ from src.entities.service.schemas import (
     ServiceUpdateSchema,
 )
 
-services_router = APIRouter(prefix="/services", tags=["💵 Services"])
+services_router = APIRouter(
+    prefix="/services",
+    tags=["💵 Services"],
+    route_class=ServiceExceptionHandlerRoute,
+)
 
 
 @services_router.post(

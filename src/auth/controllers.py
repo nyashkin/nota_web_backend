@@ -6,11 +6,16 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from src.auth.dependencies import AuthServiceDI
 from src.auth.enums import AuthUrls
+from src.auth.exception_handler import AuthExceptionHandlerRoute
 from src.auth.schemas import AuthTokenRead
 from src.core import config
 from src.entities.user.schemas import UserCreateSchema, UserReadSchema
 
-auth_router = APIRouter(prefix="/auth", tags=["🔑 Auth"])
+auth_router = APIRouter(
+    prefix="/auth",
+    tags=["🔑 Auth"],
+    route_class=AuthExceptionHandlerRoute,
+)
 
 
 @auth_router.post("/login", response_model=AuthTokenRead)
