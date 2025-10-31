@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import Field, PositiveInt
 
 from src.core.schemas import BaseAppSchema
-from src.entities.user.enums import UserRole
+from src.entities.user.enums import UserRoleEnum
 
 
 class UserUpdateSchema(BaseAppSchema):
@@ -15,13 +15,13 @@ class UserUpdateSchema(BaseAppSchema):
 
 class UserReadSchema(UserUpdateSchema):
     id: PositiveInt
-    role: UserRole
+    role: UserRoleEnum
     created_at: datetime
     updated_at: datetime
 
 
 class UserCreateSchema(UserUpdateSchema):
-    role: UserRole
+    role: UserRoleEnum
     password: str
 
 

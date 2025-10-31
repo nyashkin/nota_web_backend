@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from src.entities.user.enums import UserRole
+from src.entities.user.enums import UserRoleEnum
 from src.entities.user.schemas import UserCreateSchema, UserReadSchema
 
 
@@ -15,7 +15,7 @@ class TestUserControllers:
         create_user_schema = UserCreateSchema(
             username="user",
             password="secret_password",
-            role=UserRole.USER,
+            role=UserRoleEnum.USER,
             phone_number="+11111111111",
             first_name="John",
             last_name="Doe",

@@ -12,7 +12,7 @@ from src.auth.exceptions.http import (
 from src.auth.services import AuthService, CryptoService
 from src.core.exceptions.http import BaseHTTPException
 from src.entities.user.dependencies import UserServiceDI
-from src.entities.user.enums import UserRole
+from src.entities.user.enums import UserRoleEnum
 from src.entities.user.exceptions.domain import (
     UserNotFoundException,
 )
@@ -44,7 +44,7 @@ CurrentUserDI = Annotated[UserReadSchema, AuthRequiredDI]
 
 
 async def check_admin_access(current_user: CurrentUserDI) -> UserReadSchema:
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != UserRoleEnum.ADMIN:
         raise BaseHTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return current_user
 
@@ -52,10 +52,10 @@ async def check_admin_access(current_user: CurrentUserDI) -> UserReadSchema:
 AdminRequiredDI = Depends(check_admin_access)
 
 
-async def check_user_access(current_user: CurrentUserDI) -> UserReadSchema:
-    if current_user.role != UserRole.USER:
+async def check_customer_access(current_user: CurrentUserDI) -> UserReadSchema:
+    if current_user.role != UserRoleEnum.CUSTOMER:
         raise BaseHTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return current_user
 
 
-UserRequiredDI = Depends(check_user_access)
+UserRequiredDI = Depends(check_customer_access)
