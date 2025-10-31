@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from src.core import config as app_config
 from src.core.database.base_model import BaseOrm
+from src.entities.orders.models import OrderOrm  # noqa: F401
 from src.entities.service.models import ServiceOrm  # noqa: F401
 from src.entities.service_category.models import ServiceCategoryOrm  # noqa: F401
 from src.entities.user.models import UserOrm  # noqa: F401

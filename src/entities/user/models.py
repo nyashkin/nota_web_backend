@@ -1,5 +1,5 @@
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.database.base_model import BaseOrm
 from src.core.database.mixins import IdMixin, TimestampMixin
@@ -14,3 +14,15 @@ class UserOrm(BaseOrm, IdMixin, TimestampMixin):
     phone_number: Mapped[str] = mapped_column(String(20), nullable=False)
     first_name: Mapped[str] = mapped_column(String(20), nullable=False)
     last_name: Mapped[str] = mapped_column(String(20), nullable=False)
+
+    orders_as_customer = relationship(
+        "OrderOrm",
+        uselist=True,
+        foreign_keys="OrderOrm.customer_id",
+    )
+
+    orders_as_notary = relationship(
+        "OrderOrm",
+        uselist=True,
+        foreign_keys="OrderOrm.notary_id",
+    )
