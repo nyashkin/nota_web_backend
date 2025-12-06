@@ -11,6 +11,3 @@ class UserOrm(BaseOrm, IdMixin, TimestampMixin):
     username: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(256), nullable=False)
     role: Mapped[UserRole] = mapped_column(String(16), nullable=False)
-    phone_number: Mapped[str] = mapped_column(String(20), nullable=False)
-    first_name: Mapped[str] = mapped_column(String(20), nullable=False)
-    last_name: Mapped[str] = mapped_column(String(20), nullable=False)
