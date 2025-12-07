@@ -39,13 +39,13 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.ForeignKeyConstraint(
-            ["parent_id"], ["service_categories.id"], ondelete="CASCADE"
+            ["parent_id"], ["service_categories.id"], ondelete="CASCADE",
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
     )
     op.create_index(
-        op.f("ix_service_categories_id"), "service_categories", ["id"], unique=False
+        op.f("ix_service_categories_id"), "service_categories", ["id"], unique=False,
     )
     op.create_table(
         "users",

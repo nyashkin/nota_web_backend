@@ -1,10 +1,12 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Path
 from pydantic import PositiveInt
 from starlette import status
 
-from src.auth.dependencies import AuthRequiredDI
+from src.auth.dependencies import AdminRoleRequiredDI
 from src.entities.service.dependencies import ServiceServiceDI
-from src.entities.service.exception_handler import ServiceExceptionHandlerRoute
+from src.entities.service.exception_api_route import ServiceExceptionHandlerRoute
 from src.entities.service.exceptions.domain import (
     NotUniqueServiceTitleException,
     ServiceNotFoundException,
@@ -25,41 +27,48 @@ services_router = APIRouter(
     route_class=ServiceExceptionHandlerRoute,
 )
 
+# CREATE
+
 
 @services_router.post(
-    "/", status_code=status.HTTP_201_CREATED, dependencies=[AuthRequiredDI]
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[AdminRoleRequiredDI],
 )
 async def create_service(
     service_service: ServiceServiceDI,
     service_create: ServiceCreateSchema,
 ) -> ServiceReadSchema:
-    try:
-        service_read = await service_service.create_service(service_create)
-    except NotUniqueServiceTitleException:
-        raise NotUniqueServiceTitleHTTPException
-    return service_read
+    service_read_dto = await service_service.create_service(service_create)
+    return ServiceReadSchema.model_validate(service_read_dto)
 
 
-@services_router.get("/")
+# READ
+
+
+@services_router.get("/{service_id}")
 async def get_service(
     service_service: ServiceServiceDI,
-    service_id: int,
+    service_id: Annotated[PositiveInt, Path()],
 ) -> ServiceReadSchema:
-    try:
-        service_read = await service_service.get_service_by_id(service_id)
-    except ServiceNotFoundException:
-        raise ServiceNotFoundHTTPException
-    return service_read
+    service_read_dto = await service_service.get_service_by_id(service_id)
+    return ServiceReadSchema.model_validate(service_read_dto)
 
 
-@services_router.patch("/", dependencies=[AuthRequiredDI])
+# UPDATE
+
+
+@services_router.patch(
+    "/{service_id}",
+    dependencies=[AdminRoleRequiredDI],
+)
 async def update_service(
     service_service: ServiceServiceDI,
-    service_id: PositiveInt,
+    service_id: Annotated[PositiveInt, Path()],
     service_update: ServiceUpdateSchema,
 ) -> ServiceReadSchema:
     try:
-        service_read = await service_service.update_service(
+        service_read_dto = await service_service.update_service(
             service_id,
             service_update,
         )
@@ -67,17 +76,20 @@ async def update_service(
         raise ServiceNotFoundHTTPException
     except NotUniqueServiceTitleException:
         raise NotUniqueServiceTitleHTTPException
-    return service_read
+    return ServiceReadSchema.model_validate(service_read_dto)
+
+
+# DELETE
 
 
 @services_router.delete(
-    "/",
-    dependencies=[AuthRequiredDI],
+    "/{service_id}",
+    dependencies=[AdminRoleRequiredDI],
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_service(
     service_service: ServiceServiceDI,
-    service_id: PositiveInt,
+    service_id: Annotated[PositiveInt, Path()],
 ) -> None:
     await service_service.delete_service(service_id)
     return None

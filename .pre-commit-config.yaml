@@ -3,9 +3,11 @@ repos:
     hooks:
       - id: ruff
         name: ruff check
-        entry: ruff check
+        entry: ruff check src tests
         language: system
         types: [python]
+        args: [--config=pyproject.toml]
+        pass_filenames: false
 
       - id: mypy
         name: mypy
@@ -15,3 +17,11 @@ repos:
         args: [--config-file=pyproject.toml]
         pass_filenames: false
         require_serial: true
+      
+      - id: tests
+        name: pytest
+        entry: pytest tests/unit
+        language: system
+        types: [python]
+        args: [--config-file=pyproject.toml]
+        pass_filenames: false

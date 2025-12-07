@@ -1,7 +1,7 @@
 from enum import StrEnum
 
 
-class UserRole(StrEnum):
-    USER = "customer"
+class UserRoleEnum(StrEnum):
+    CUSTOMER = "customer"
     NOTARY = "notary"
     ADMIN = "admin"

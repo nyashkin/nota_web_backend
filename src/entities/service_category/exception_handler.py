@@ -6,11 +6,13 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from src.entities.service_category.exceptions.domain import (
+    ParentServiceCategoryNotFoundException,
     ServiceCategoryCreateException,
     ServiceCategoryIdAndParentIdCannotBeEqualException,
     ServiceCategoryNotFoundException,
 )
 from src.entities.service_category.exceptions.http import (
+    ParentServiceCategoryNotFoundHTTPException,
     ServiceCategoryCreateHTTPException,
     ServiceCategoryIdAndParentIdCannotBeEqualHTTPError,
     ServiceCategoryNotFoundHTTPException,
@@ -30,6 +32,8 @@ class ServiceCategoryExceptionHandleRoute(APIRoute):
                 raise ServiceCategoryCreateHTTPException
             except ServiceCategoryIdAndParentIdCannotBeEqualException:
                 raise ServiceCategoryIdAndParentIdCannotBeEqualHTTPError
+            except ParentServiceCategoryNotFoundException:
+                raise ParentServiceCategoryNotFoundHTTPException
             except Exception as e:
                 logger.error(e)
                 raise e

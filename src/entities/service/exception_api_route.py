@@ -7,10 +7,12 @@ from starlette.responses import Response
 
 from src.entities.service.exceptions.domain import (
     NotUniqueServiceTitleException,
+    ServiceCategoryForServiceNotFoundException,
     ServiceNotFoundException,
 )
 from src.entities.service.exceptions.http import (
     NotUniqueServiceTitleHTTPException,
+    ServiceCategoryForServiceNotFoundHTTPException,
     ServiceNotFoundHTTPException,
 )
 
@@ -26,6 +28,10 @@ class ServiceExceptionHandlerRoute(APIRoute):
                 raise ServiceNotFoundHTTPException
             except NotUniqueServiceTitleException:
                 raise NotUniqueServiceTitleHTTPException
+            except ServiceCategoryForServiceNotFoundException as e:
+                raise ServiceCategoryForServiceNotFoundHTTPException(
+                    e.service_category_id,
+                )
             except Exception as e:
                 logger.error(e)
                 raise

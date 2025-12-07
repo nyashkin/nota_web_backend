@@ -3,13 +3,14 @@ from typing import Annotated
 from fastapi import APIRouter, Path
 from pydantic import PositiveInt
 
-from src.auth.dependencies import AdminRequiredDI, AuthRequiredDI, CurrentUserDI
+from src.auth.dependencies import AdminRoleRequiredDI, AuthRequiredDI, CurrentUserDI
 from src.entities.user.dependencies import UserServiceDI
+from src.entities.user.dto import UserUpdateDTO
 from src.entities.user.exception_handler import UserExceptionHandlerRoute
 from src.entities.user.schemas import UserReadSchema, UserUpdateSchema
 
 user_router = APIRouter(
-    prefix="/users", tags=["👥 Users"], route_class=UserExceptionHandlerRoute
+    prefix="/users", tags=["👥 Users"], route_class=UserExceptionHandlerRoute,
 )
 
 
@@ -32,7 +33,12 @@ async def update_self(
     user: CurrentUserDI,
     update_user: UserUpdateSchema,
 ) -> UserReadSchema:
-    return await user_service.update_user(user.id, update_user)
+    user_update_dto = UserUpdateDTO.model_validate(update_user)
+    user_dto = await user_service.update_user(
+        user.id,
+        user_update_dto,
+    )
+    return UserReadSchema.model_validate(user_dto)
 
 
 @user_router.put(
@@ -45,7 +51,8 @@ async def update_self_username(
     current_user: CurrentUserDI,
     new_username: str,
 ) -> UserReadSchema:
-    return await user_service.change_username(current_user.id, new_username)
+    user_dto = await user_service.change_username(current_user.id, new_username)
+    return UserReadSchema.model_validate(user_dto)
 
 
 @user_router.get(
@@ -54,17 +61,19 @@ async def update_self_username(
     response_model=UserReadSchema,
 )
 async def get_user_by_id(
-    user_service: UserServiceDI, user_id: Annotated[PositiveInt, Path()]
+    user_service: UserServiceDI, user_id: Annotated[PositiveInt, Path()],
 ) -> UserReadSchema:
-    return await user_service.get_user_by_id(user_id)
+    user_dto = await user_service.get_user_by_id(user_id)
+    return UserReadSchema.model_validate(user_dto)
 
 
 @user_router.put(
     path="/{user_id}",
-    dependencies=[AdminRequiredDI],
+    dependencies=[AdminRoleRequiredDI],
     response_model=UserReadSchema,
 )
 async def update_username_by_id(
-    user_service: UserServiceDI, user_id: Annotated[int, Path()], new_username: str
+    user_service: UserServiceDI, user_id: Annotated[int, Path()], new_username: str,
 ) -> UserReadSchema:
-    return await user_service.change_username(user_id, new_username)
+    user_dto = await user_service.change_username(user_id, new_username)
+    return UserReadSchema.model_validate(user_dto)

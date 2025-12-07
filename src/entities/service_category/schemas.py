@@ -1,20 +1,27 @@
-from datetime import datetime
-
-from pydantic import Field, PositiveInt
-
 from src.core.schemas import BaseAppSchema
+from src.entities.service_category.dto import (
+    ServiceCategoryCreateDTO,
+    ServiceCategoryReadDTO,
+    ServiceCategoryUpdateDTO,
+)
 
 
-class ServiceCategoryUpdateShema(BaseAppSchema):
-    name: str = Field(min_length=5, max_length=32)
-    parent_id: PositiveInt | None
-
-
-class ServiceCategoryCreateShema(ServiceCategoryUpdateShema):
+class ServiceCategoryUpdateSchema(
+    ServiceCategoryUpdateDTO,
+    BaseAppSchema,
+):
     pass
 
 
-class ServiceCategoryReadSchema(ServiceCategoryCreateShema):
-    id: int
-    created_at: datetime
-    updated_at: datetime
+class ServiceCategoryCreateSchema(
+    ServiceCategoryCreateDTO,
+    BaseAppSchema,
+):
+    pass
+
+
+class ServiceCategoryReadSchema(
+    ServiceCategoryReadDTO,
+    BaseAppSchema,
+):
+    pass

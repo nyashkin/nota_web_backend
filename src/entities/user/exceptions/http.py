@@ -19,7 +19,7 @@ class UserAlreadyExistsHTTPException(BaseHTTPException):
     def __init__(self, exc: UsernameAlredyExistsException | None = None) -> None:
         if not exc:
             super().__init__(
-                status.HTTP_409_CONFLICT, "User with same name already exists", None
+                status.HTTP_409_CONFLICT, "User with same name already exists", None,
             )
             return
         super().__init__(status.HTTP_409_CONFLICT, str(exc), None)

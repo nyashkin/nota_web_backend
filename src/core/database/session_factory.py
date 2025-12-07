@@ -4,7 +4,11 @@ from src.core import config
 
 _engine = create_async_engine(url=str(config.db.dsn))
 
-_session_maker = async_sessionmaker(_engine, autoflush=True, expire_on_commit=False)
+_session_maker = async_sessionmaker(
+    _engine,
+    autoflush=False,
+    expire_on_commit=False,
+)
 
 
 def get_session_maker() -> async_sessionmaker[AsyncSession]:

@@ -1,25 +1,23 @@
-from datetime import datetime
-from decimal import Decimal
-
-from pydantic import Field
-
 from src.core.schemas import BaseAppSchema
-from src.entities.service_category.schemas import ServiceCategoryReadSchema
+from src.entities.service.dto import ServiceCreateDTO, ServiceReadDTO, ServiceUpdateDTO
 
 
-class ServiceUpdateSchema(BaseAppSchema):
-    title: str = Field(min_length=8, max_length=128)
-    description: str = Field(min_length=8, max_length=256)
-    price: Decimal
-    category_id: int
-
-
-class ServiceCreateSchema(ServiceUpdateSchema):
+class ServiceUpdateSchema(
+    ServiceUpdateDTO,
+    BaseAppSchema,
+):
     pass
 
 
-class ServiceReadSchema(ServiceUpdateSchema):
-    id: int
-    created_at: datetime
-    updated_at: datetime
-    category: ServiceCategoryReadSchema | None
+class ServiceCreateSchema(
+    ServiceCreateDTO,
+    BaseAppSchema,
+):
+    pass
+
+
+class ServiceReadSchema(
+    ServiceReadDTO,
+    BaseAppSchema,
+):
+    pass

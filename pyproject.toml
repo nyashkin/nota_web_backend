@@ -32,4 +32,8 @@ dev = [
 plugins = ['pydantic.mypy']
 
 [tool.ruff.lint]
-select = ["I", "E", "W", "F"]
+select = ["I", "E", "W", "F", "C"]
+
+[tool.pytest.ini_options]
+pythonpath = ". src"
+testpaths = ["tests"]

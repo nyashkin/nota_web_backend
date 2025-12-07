@@ -9,7 +9,7 @@ from src.auth.enums import AuthUrls
 from src.auth.exception_handler import AuthExceptionHandlerRoute
 from src.auth.schemas import AuthTokenRead
 from src.core import config
-from src.entities.user.schemas import UserCreateSchema, UserReadSchema
+from src.entities.user.schemas import UserCreateDTO, UserReadSchema
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -25,7 +25,7 @@ async def login(
     response: Response,
 ) -> AuthTokenRead:
     token_read = await auth_service.login_user(
-        username=creds.username, password=creds.password
+        username=creds.username, password=creds.password,
     )
 
     response.set_cookie(
@@ -35,7 +35,7 @@ async def login(
         secure=False,
         samesite="strict",
         max_age=int(
-            timedelta(days=config.auth.refresh_token_expire_days).total_seconds()
+            timedelta(days=config.auth.refresh_token_expire_days).total_seconds(),
         ),
         path=AuthUrls.REFRESH_URL,
     )
@@ -59,14 +59,16 @@ async def logout(
 
 @auth_router.post("/register", response_model=UserReadSchema)
 async def register(
-    auth_service: AuthServiceDI, create_user: UserCreateSchema
+    auth_service: AuthServiceDI,
+    create_user: UserCreateDTO,
 ) -> UserReadSchema:
-    return await auth_service.register_user(create_user)
+    user = await auth_service.register_user(create_user)
+    return UserReadSchema.model_validate(user)
 
 
 @auth_router.post("/refresh", response_model=AuthTokenRead)
 async def refresh(
-    auth_service: AuthServiceDI, refresh_token: Annotated[str, Cookie()]
+    auth_service: AuthServiceDI, refresh_token: Annotated[str, Cookie()],
 ) -> AuthTokenRead:
     new_access_token = await auth_service.refresh_token(refresh_token)
     return new_access_token

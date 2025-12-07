@@ -1,6 +1,4 @@
-from . import mixins
-from .base_model import BaseOrm
-from .dependencies import UoWDI
-from .session_factory import get_session_maker
+from src.core.database import mixins
+from src.core.database.session_factory import get_session_maker
 
 __all__ = ["mixins", "UoWDI", "BaseOrm", "get_session_maker"]
