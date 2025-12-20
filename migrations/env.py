@@ -10,6 +10,7 @@ from src.entities.notary_profiles.models import NotaryProfileOrm  # noqa: F401
 from src.entities.service.models import ServiceOrm  # noqa: F401
 from src.entities.service_category.models import ServiceCategoryOrm  # noqa: F401
 from src.entities.user.models import UserOrm  # noqa: F401
+from src.entities.booking.models import BookingOrm  # noqa: F401 I001
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

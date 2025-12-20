@@ -1,7 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
+from pydantic import PositiveInt
+from typing_extensions import Annotated
 
-from src.auth.dependencies import CurrentUserDI, CustomerRoleRequiredDI
+from src.auth.dependencies import (
+    CurrentUserDI,
+    CustomerRoleRequiredDI,
+)
+from src.entities.booking.dependencies import BookingServiceDI
+from src.entities.booking.schemas import BookingCreateSchema, BookingReadSchema
 from src.entities.customer_profiles.dependencies import (
+    CustomerProfileDI,
     CustomerProfileRequiredDI,
     CustomerProfileServiceDI,
 )
@@ -70,3 +78,39 @@ async def update_me_customer_profile(
         )
     )
     return CustomerProfileReadSchema.model_validate(customer_profile_dto)
+
+
+@customer_profiles_router.get(
+    "/me/bookings",
+    dependencies=[CustomerProfileRequiredDI],
+    response_model=list[BookingReadSchema],
+)
+async def get_me_customer_profile_bookings(
+    bookings_service: BookingServiceDI,
+    current_profile: CustomerProfileDI,
+) -> list[BookingReadSchema]:
+    booking_schemas = await bookings_service.get_booking_by_customer_profile_id(
+        current_profile.id
+    )
+    return booking_schemas
+
+
+@customer_profiles_router.post(
+    "/me/bookings",
+    dependencies=[CustomerProfileRequiredDI],
+    response_model=BookingReadSchema,
+)
+async def create_customer_profile_booking(
+    bookings_service: BookingServiceDI,
+    current_profile: CustomerProfileDI,
+    service_id: Annotated[PositiveInt, Body()],
+    notary_profile_id: Annotated[PositiveInt, Body()],
+) -> BookingReadSchema:
+    booking = await bookings_service.create_booking(
+        BookingCreateSchema(
+            customer_profile_id=current_profile.id,
+            service_id=service_id,
+            notary_profile_id=notary_profile_id,
+        )
+    )
+    return booking

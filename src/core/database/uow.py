@@ -3,6 +3,7 @@ from typing import Self
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from src.entities.booking.repository import BookingRepository
 from src.entities.customer_profiles.repository import CustomerProfileRepository
 from src.entities.notary_profiles.repository import NotaryProfileRepository
 from src.entities.service.repository import ServiceRepository
@@ -25,6 +26,7 @@ class UoW:
         self.notary_profiles = NotaryProfileRepository(self._session)
         self.service_categories = ServiceCategoryRepository(self._session)
         self.services = ServiceRepository(self._session)
+        self.booking_repository = BookingRepository(self._session)
         return self
 
     async def __aexit__(

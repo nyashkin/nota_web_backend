@@ -49,6 +49,7 @@ async def create_service_category(
 @service_categories_router.get(
     "/",
     response_model=list[ServiceCategoryReadSchema],
+    response_model_exclude_none=True,
 )
 async def get_all_categories(
     service_categories_service: ServiceCategoryServiceDI,
