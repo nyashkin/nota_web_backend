@@ -10,7 +10,7 @@ from src.entities.customer_profiles.dto import (
     CustomerProfileUpdateDTO,
 )
 from src.entities.customer_profiles.exceptions.domain import (
-    CustomerProfileNotFoundException,
+    CustomerProfileNotFoundError,
 )
 from src.entities.customer_profiles.service import CustomerProfileService
 
@@ -71,10 +71,10 @@ class TestCustomerProfileService:
 
     async def test_get_customer_profile_by_user_id_not_found(self, service, uow_mock):
         uow_mock.customer_profiles.get_customer_profile_by_user_id.side_effect = (
-            CustomerProfileNotFoundException
+            CustomerProfileNotFoundError
         )
 
-        with pytest.raises(CustomerProfileNotFoundException):
+        with pytest.raises(CustomerProfileNotFoundError):
             await service.get_customer_profile_by_user_id(10)
 
     # --------------------------
@@ -132,5 +132,5 @@ class TestCustomerProfileService:
             None
         )
 
-        with pytest.raises(CustomerProfileNotFoundException):
+        with pytest.raises(CustomerProfileNotFoundError):
             await service.update_customer_profile_by_user_id(10, update_dto)

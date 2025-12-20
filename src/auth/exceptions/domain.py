@@ -1,22 +1,22 @@
-from src.core.exceptions.domain import BaseDomainException
+from src.core.exceptions.domain import BaseDomainError
 
 
-class PasswordOrUsernameInvalidException(BaseDomainException):
+class PasswordOrUsernameInvalidError(BaseDomainError):
     def __str__(self) -> str:
         return "Username or password is invalid"
 
 
-class InvalidJwtTokenException(BaseDomainException):
+class InvalidJwtTokenError(BaseDomainError):
     def __str__(self) -> str:
         return "Invalid jwt token"
 
 
-class JwtTokenExpiredException(BaseDomainException):
+class JwtTokenExpiredError(BaseDomainError):
     def __str__(self) -> str:
         return "Jwt token expired"
 
 
-class JwtInvalidTokenTypeException(BaseDomainException):
+class JwtInvalidTokenTypeError(BaseDomainError):
     def __init__(self, type: str):
         self.type = type
 

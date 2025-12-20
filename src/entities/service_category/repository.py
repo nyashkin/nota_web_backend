@@ -8,8 +8,8 @@ from src.entities.service_category.dto import (
     ServiceCategoryUpdateDTO,
 )
 from src.entities.service_category.exceptions.domain import (
-    ServiceCategoryCreateException,
-    ServiceCategoryNotFoundException,
+    ServiceCategoryCreateError,
+    ServiceCategoryNotFoundError,
 )
 from src.entities.service_category.exceptions.http import (
     ServiceCategoryIdAndParentIdCannotBeEqualHTTPError,
@@ -33,7 +33,7 @@ class ServiceCategoryRepository:
             if category_orm.id == category_orm.parent_id:
                 raise ServiceCategoryIdAndParentIdCannotBeEqualHTTPError
         except IntegrityError:
-            raise ServiceCategoryCreateException
+            raise ServiceCategoryCreateError
         return ServiceCategoryReadDTO.model_validate(category_orm)
 
     async def update_category(
@@ -44,7 +44,7 @@ class ServiceCategoryRepository:
         try:
             category_orm = await self._get_category_orm_by_id(id)
             if not category_orm:
-                raise ServiceCategoryNotFoundException
+                raise ServiceCategoryNotFoundError
             for key, val in update_category.model_dump(exclude_unset=True).items():
                 category_orm.__setattr__(key, val)
             await self._session.flush()
@@ -52,7 +52,7 @@ class ServiceCategoryRepository:
             if category_orm.id == category_orm.parent_id:
                 raise ServiceCategoryIdAndParentIdCannotBeEqualHTTPError
         except IntegrityError:
-            raise ServiceCategoryCreateException
+            raise ServiceCategoryCreateError
         return ServiceCategoryReadDTO.model_validate(category_orm)
 
     async def delete_category(self, id: int):

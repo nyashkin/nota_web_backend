@@ -6,8 +6,8 @@ from src.entities.service_category.dto import (
     ServiceCategoryUpdateDTO,
 )
 from src.entities.service_category.exceptions.domain import (
-    ParentServiceCategoryNotFoundException,
-    ServiceCategoryNotFoundException,
+    ParentServiceCategoryNotFoundError,
+    ServiceCategoryNotFoundError,
 )
 
 
@@ -24,7 +24,7 @@ class ServiceCategoryService:
                 parent_id,
             )
             if not parent_category:
-                raise ParentServiceCategoryNotFoundException
+                raise ParentServiceCategoryNotFoundError
         return await self._uow.service_categories.create_category(create_category)
 
     async def update_category(
@@ -52,7 +52,7 @@ class ServiceCategoryService:
     ) -> list[ServiceReadDTO]:
         category = await self._uow.service_categories.get_category_by_id(category_id)
         if not category:
-            raise ServiceCategoryNotFoundException
+            raise ServiceCategoryNotFoundError
         return await self._uow.services.get_services_by_category_id(category_id)
 
     async def delete_category(self, category_id: int) -> None:
@@ -60,5 +60,5 @@ class ServiceCategoryService:
             category_id,
         )
         if not category_to_delete:
-            raise ServiceCategoryNotFoundException
+            raise ServiceCategoryNotFoundError
         await self._uow.service_categories.delete_category(category_to_delete.id)

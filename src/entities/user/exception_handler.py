@@ -6,8 +6,8 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from src.entities.user.exceptions.domain import (
-    UsernameAlredyExistsException,
-    UserNotFoundException,
+    UsernameAlredyExistsError,
+    UserNotFoundError,
 )
 from src.entities.user.exceptions.http import (
     UserAlreadyExistsHTTPException,
@@ -22,9 +22,9 @@ class UserExceptionHandlerRoute(APIRoute):
         async def user_exception_handler_route(request: Request) -> Response:
             try:
                 return await orig_route(request)
-            except UserNotFoundException:
+            except UserNotFoundError:
                 raise UserNotFoundHTTPException
-            except UsernameAlredyExistsException:
+            except UsernameAlredyExistsError:
                 raise UserAlreadyExistsHTTPException
             except Exception as e:
                 logger.error(e)

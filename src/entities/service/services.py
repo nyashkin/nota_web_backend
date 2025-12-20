@@ -1,7 +1,7 @@
 from src.core.database.dependencies import UoWDI
 from src.entities.service.dto import ServiceCreateDTO, ServiceReadDTO, ServiceUpdateDTO
 from src.entities.service.exceptions.domain import (
-    ServiceCategoryForServiceNotFoundException,
+    ServiceCategoryForServiceNotFoundError,
 )
 
 
@@ -17,7 +17,7 @@ class ServiceService:
             service_create.category_id,
         )
         if not service_category:
-            raise ServiceCategoryForServiceNotFoundException(service_create.category_id)
+            raise ServiceCategoryForServiceNotFoundError(service_create.category_id)
         return await self._uow.services.create_service(service_create)
 
     async def get_service_by_id(

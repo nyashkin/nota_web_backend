@@ -5,7 +5,7 @@ from fastapi import Depends
 from src.auth.dependencies import CurrentCustomerUser
 from src.entities.customer_profiles.dto import CustomerProfileReadDTO
 from src.entities.customer_profiles.exceptions.domain import (
-    CustomerProfileNotFoundException,
+    CustomerProfileNotFoundError,
 )
 from src.entities.customer_profiles.exceptions.http import (
     CustomerProfileNotFoundHTTPException,
@@ -23,7 +23,7 @@ async def get_customer_profile(
         return await customer_profile_service.get_customer_profile_by_user_id(
             curren_customer_user.id,
         )
-    except CustomerProfileNotFoundException:
+    except CustomerProfileNotFoundError:
         raise CustomerProfileNotFoundHTTPException
 
 

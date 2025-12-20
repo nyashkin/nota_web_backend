@@ -5,8 +5,8 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from src.auth.exceptions.domain import (
-    InvalidJwtTokenException,
-    JwtTokenExpiredException,
+    InvalidJwtTokenError,
+    JwtTokenExpiredError,
 )
 from src.auth.exceptions.http import (
     InvalidJwtTokenHTTPException,
@@ -22,9 +22,9 @@ class AuthExceptionHandlerRoute(UserExceptionHandlerRoute):
         async def auth_exception_route(request: Request) -> Response:
             try:
                 return await user_exception_route(request)
-            except JwtTokenExpiredException:
+            except JwtTokenExpiredError:
                 raise JwtTokenExpiredHTTPException
-            except InvalidJwtTokenException:
+            except InvalidJwtTokenError:
                 raise InvalidJwtTokenHTTPException
             except Exception as e:
                 logger.error(e)

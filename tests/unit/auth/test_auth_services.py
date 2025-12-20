@@ -7,9 +7,9 @@ import pytest
 
 from src.auth.enums import TokenType
 from src.auth.exceptions.domain import (
-    InvalidJwtTokenException,
-    JwtTokenExpiredException,
-    PasswordOrUsernameInvalidException,
+    InvalidJwtTokenError,
+    JwtTokenExpiredError,
+    PasswordOrUsernameInvalidError,
 )
 from src.auth.schemas import AuthTokenRead, TokenRead
 from src.auth.services import AuthService, CryptoService
@@ -78,7 +78,7 @@ class TestCryptoService:
         assert payload.type == TokenType.REFRESH
 
     def test_get_payload_invalid_token(self):
-        with pytest.raises(InvalidJwtTokenException):
+        with pytest.raises(InvalidJwtTokenError):
             CryptoService.get_payload("invalid.token.string")
 
     def test_get_payload_expired_token(self, user_read_dto):
@@ -91,9 +91,11 @@ class TestCryptoService:
             "type": TokenType.ACCESS,
         }
         token = jwt.encode(
-            expired_payload, CryptoService.private_key, algorithm=CryptoService.alg,
+            expired_payload,
+            CryptoService.private_key,
+            algorithm=CryptoService.alg,
         )
-        with pytest.raises(JwtTokenExpiredException):
+        with pytest.raises(JwtTokenExpiredError):
             CryptoService.get_payload(token)
 
 
@@ -103,7 +105,11 @@ class TestCryptoService:
 @pytest.mark.asyncio
 class TestAuthService:
     async def test_register_user(
-        self, uow_mock, user_service_mock, create_user_read_dto, user_read_dto,
+        self,
+        uow_mock,
+        user_service_mock,
+        create_user_read_dto,
+        user_read_dto,
     ):
         service = AuthService(uow=uow_mock, user_service=user_service_mock)
         result = await service.register_user(create_user_read_dto)
@@ -112,12 +118,17 @@ class TestAuthService:
         assert result == user_read_dto
 
     async def test_login_user_success(
-        self, uow_mock, user_service_mock, user_read_dto, monkeypatch,
+        self,
+        uow_mock,
+        user_service_mock,
+        user_read_dto,
+        monkeypatch,
     ):
         service = AuthService(uow=uow_mock, user_service=user_service_mock)
 
         monkeypatch.setattr(
-            "src.auth.services.check_password", lambda pw, hash_pw: True,
+            "src.auth.services.check_password",
+            lambda pw, hash_pw: True,
         )
         uow_mock.users.get_user_by_username.return_value = user_read_dto
 
@@ -128,15 +139,19 @@ class TestAuthService:
         assert result.token_type == "bearer"
 
     async def test_login_user_invalid_password(
-        self, uow_mock, user_service_mock, monkeypatch,
+        self,
+        uow_mock,
+        user_service_mock,
+        monkeypatch,
     ):
         service = AuthService(uow=uow_mock, user_service=user_service_mock)
 
         monkeypatch.setattr(
-            "src.auth.services.check_password", lambda pw, hash_pw: False,
+            "src.auth.services.check_password",
+            lambda pw, hash_pw: False,
         )
 
-        with pytest.raises(PasswordOrUsernameInvalidException):
+        with pytest.raises(PasswordOrUsernameInvalidError):
             await service.login_user("testuser", "wrongpassword")
 
     async def test_refresh_token_success(self, uow_mock, user_read_dto):
@@ -153,5 +168,5 @@ class TestAuthService:
     async def test_refresh_token_invalid(self):
         service = AuthService(uow=MagicMock(), user_service=MagicMock())
 
-        with pytest.raises(InvalidJwtTokenException):
+        with pytest.raises(InvalidJwtTokenError):
             await service.refresh_token("invalid.token.string")

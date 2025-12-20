@@ -14,7 +14,7 @@ from src.entities.user.dependencies import UserServiceDI
 from src.entities.user.dto import UserReadDTO
 from src.entities.user.enums import UserRoleEnum
 from src.entities.user.exceptions.domain import (
-    UserNotFoundException,
+    UserNotFoundError,
 )
 from src.entities.user.schemas import UserReadSchema
 
@@ -38,7 +38,7 @@ async def get_current_user(
         raise InvalidJwtTokenTypeHTTPException
     try:
         user = await user_service.get_user_by_id(int(payload.sub))
-    except UserNotFoundException:
+    except UserNotFoundError:
         raise NotAuthenticatedHTTPException
     return user
 

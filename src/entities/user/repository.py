@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.entities.user.dto import UserCreateDTO, UserReadDTO, UserUpdateDTO
 from src.entities.user.exceptions.domain import (
-    UsernameAlredyExistsException,
-    UserNotFoundException,
+    UsernameAlredyExistsError,
+    UserNotFoundError,
 )
 from src.entities.user.models import UserOrm
 
@@ -21,7 +21,7 @@ class UserRepository:
             await self._session.commit()
             await self._session.refresh(user)
         except IntegrityError:
-            raise UsernameAlredyExistsException(user_create.username)
+            raise UsernameAlredyExistsError(user_create.username)
         return UserReadDTO.model_validate(user)
 
     async def get_user_by_id(self, id: int) -> UserReadDTO:
@@ -45,7 +45,7 @@ class UserRepository:
             await self._session.commit()
             return UserReadDTO.model_validate(user)
         except IntegrityError:
-            raise UsernameAlredyExistsException(username)
+            raise UsernameAlredyExistsError(username)
 
     async def update_user(
         self,
@@ -63,7 +63,7 @@ class UserRepository:
             await self._session.execute(query)
         ).scalar_one_or_none()
         if not user_orm:
-            raise UserNotFoundException(id)
+            raise UserNotFoundError(id)
         return user_orm
 
     async def _get_user_model_by_username(self, username: str) -> UserOrm:
@@ -72,5 +72,5 @@ class UserRepository:
             await self._session.execute(query)
         ).scalar_one_or_none()
         if not user_orm:
-            raise UserNotFoundException
+            raise UserNotFoundError
         return user_orm

@@ -6,8 +6,8 @@ from sqlalchemy.orm import selectinload
 
 from src.entities.service.dto import ServiceCreateDTO, ServiceReadDTO, ServiceUpdateDTO
 from src.entities.service.exceptions.domain import (
-    NotUniqueServiceTitleException,
-    ServiceNotFoundException,
+    NotUniqueServiceTitleError,
+    ServiceNotFoundError,
 )
 from src.entities.service.models import ServiceOrm
 
@@ -28,7 +28,7 @@ class ServiceRepository:
             await self._session.commit()
         except IntegrityError as e:
             logger.error(e)
-            raise NotUniqueServiceTitleException(create_service.title)
+            raise NotUniqueServiceTitleError(create_service.title)
         return ServiceReadDTO.model_validate(service_orm)
 
     async def get_service_by_id(
@@ -80,7 +80,7 @@ class ServiceRepository:
             await self._session.refresh(service_orm, attribute_names=["category"])
             await self._session.commit()
         except IntegrityError:
-            raise NotUniqueServiceTitleException(update_service.title)
+            raise NotUniqueServiceTitleError(update_service.title)
         return ServiceReadDTO.model_validate(service_orm)
 
     async def delete_service(
@@ -102,5 +102,5 @@ class ServiceRepository:
             await self._session.execute(query)
         ).scalar_one_or_none()
         if not service_orm:
-            raise ServiceNotFoundException(id)
+            raise ServiceNotFoundError(id)
         return service_orm

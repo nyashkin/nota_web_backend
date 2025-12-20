@@ -8,8 +8,8 @@ from src.auth.dependencies import AdminRoleRequiredDI
 from src.entities.service.dependencies import ServiceServiceDI
 from src.entities.service.exception_api_route import ServiceExceptionHandlerRoute
 from src.entities.service.exceptions.domain import (
-    NotUniqueServiceTitleException,
-    ServiceNotFoundException,
+    NotUniqueServiceTitleError,
+    ServiceNotFoundError,
 )
 from src.entities.service.exceptions.http import (
     NotUniqueServiceTitleHTTPException,
@@ -72,9 +72,9 @@ async def update_service(
             service_id,
             service_update,
         )
-    except ServiceNotFoundException:
+    except ServiceNotFoundError:
         raise ServiceNotFoundHTTPException
-    except NotUniqueServiceTitleException:
+    except NotUniqueServiceTitleError:
         raise NotUniqueServiceTitleHTTPException
     return ServiceReadSchema.model_validate(service_read_dto)
 

@@ -5,7 +5,7 @@ from src.entities.customer_profiles.dto import (
     CustomerProfileUpdateDTO,
 )
 from src.entities.customer_profiles.exceptions.domain import (
-    CustomerProfileNotFoundException,
+    CustomerProfileNotFoundError,
 )
 
 
@@ -48,6 +48,6 @@ class CustomerProfileService:
             )
         )
         if not customer_profile:
-            raise CustomerProfileNotFoundException
+            raise CustomerProfileNotFoundError
 
         return CustomerProfileReadDTO.model_validate(customer_profile)

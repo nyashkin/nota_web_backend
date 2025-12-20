@@ -1,8 +1,8 @@
-class CustomerProfileNotFoundException(Exception):
+class CustomerProfileNotFoundError(Exception):
     def __repr__(self):
         return "Customer profile not found"
 
 
-class CustomerProfileIsNotUniqueException(Exception):
+class CustomerProfileIsNotUniqueError(Exception):
     def __repr__(self):
         return "Customer profile not found"

@@ -1,2 +1,2 @@
-class BaseDomainException(Exception):
+class BaseDomainError(Exception):
     pass

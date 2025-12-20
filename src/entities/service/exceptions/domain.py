@@ -1,7 +1,7 @@
-from src.core.exceptions.domain import BaseDomainException
+from src.core.exceptions.domain import BaseDomainError
 
 
-class ServiceNotFoundException(BaseDomainException):
+class ServiceNotFoundError(BaseDomainError):
     def __init__(self, service_id: int) -> None:
         self.service_id = service_id
 
@@ -9,7 +9,7 @@ class ServiceNotFoundException(BaseDomainException):
         return f"Service with id {self.service_id} not found"
 
 
-class ServiceCategoryForServiceNotFoundException(BaseDomainException):
+class ServiceCategoryForServiceNotFoundError(BaseDomainError):
     def __init__(self, service_category_id: int) -> None:
         self.service_category_id = service_category_id
 
@@ -17,7 +17,7 @@ class ServiceCategoryForServiceNotFoundException(BaseDomainException):
         return f"Service category with id {self.service_category_id} not found"
 
 
-class NotUniqueServiceTitleException(BaseDomainException):
+class NotUniqueServiceTitleError(BaseDomainError):
     def __init__(self, title: str) -> None:
         self.title = title
 

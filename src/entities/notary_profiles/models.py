@@ -31,7 +31,7 @@ class NotaryProfileOrm(BaseOrm, IdMixin, TimestampMixin):
         unique=True,
         nullable=False,
     )
-    inn: Mapped[str] = mapped_column(
+    inn: Mapped[Str128] = mapped_column(
         unique=True,
         nullable=False,
     )

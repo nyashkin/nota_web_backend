@@ -6,9 +6,9 @@ from loguru import logger
 
 from src.auth.enums import TokenType
 from src.auth.exceptions.domain import (
-    InvalidJwtTokenException,
-    JwtTokenExpiredException,
-    PasswordOrUsernameInvalidException,
+    InvalidJwtTokenError,
+    JwtTokenExpiredError,
+    PasswordOrUsernameInvalidError,
 )
 from src.auth.schemas import AuthTokenRead, TokenPayloadSchema, TokenRead
 from src.auth.utils import check_password, hash_password
@@ -91,10 +91,10 @@ class CryptoService:
             )
             return payload
         except jwt.ExpiredSignatureError:
-            raise JwtTokenExpiredException
+            raise JwtTokenExpiredError
         except jwt.PyJWTError as e:
             logger.error(e)
-            raise InvalidJwtTokenException
+            raise InvalidJwtTokenError
 
 
 class AuthService:
@@ -130,7 +130,7 @@ class AuthService:
                 refresh_token=CryptoService.encode_refresh_token(user),
             )
 
-        raise PasswordOrUsernameInvalidException
+        raise PasswordOrUsernameInvalidError
 
     async def refresh_token(
         self,

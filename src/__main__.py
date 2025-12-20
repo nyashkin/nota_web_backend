@@ -1,11 +1,11 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from starlette import status
 
 from src.auth.controllers import auth_router
 from src.core import config
 from src.entities.customer_profiles.controllers import customer_profiles_router
+from src.entities.notary_profiles.controllers import notary_profiles_router
 from src.entities.service.controllers import services_router
 from src.entities.service_category.controllers import service_categories_router
 from src.entities.user.controllers import user_router
@@ -16,6 +16,7 @@ def include_routers(app: FastAPI):
         auth_router,
         user_router,
         customer_profiles_router,
+        notary_profiles_router,
         service_categories_router,
         services_router,
     )
@@ -40,21 +41,21 @@ def get_app() -> FastAPI:
         title=config.api.title,
         debug=config.api.debug,
     )
+
+    @app.get(
+        "/health",
+        status_code=status.HTTP_200_OK,
+        include_in_schema=False,
+    )
+    async def health() -> dict[str, str]:
+        return {"message": "ok"}
+
     set_middlewares(app)
     include_routers(app)
     return app
 
 
 app = get_app()
-
-
-@app.get(
-    "/health",
-    status_code=status.HTTP_200_OK,
-    include_in_schema=False,
-)
-async def health() -> dict[str, str]:
-    return {"message": "ok"}
 
 
 if __name__ == "__main__":

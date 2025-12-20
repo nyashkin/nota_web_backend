@@ -9,8 +9,8 @@ from src.entities.customer_profiles.dto import (
     CustomerProfileUpdateDTO,
 )
 from src.entities.customer_profiles.exceptions.domain import (
-    CustomerProfileIsNotUniqueException,
-    CustomerProfileNotFoundException,
+    CustomerProfileIsNotUniqueError,
+    CustomerProfileNotFoundError,
 )
 from src.entities.customer_profiles.models import CustomerProfileOrm
 
@@ -36,7 +36,7 @@ class CustomerProfileRepository:
             await self._session.flush()
             return CustomerProfileReadDTO.model_validate(customer_profile_orm)
         except IntegrityError:
-            raise CustomerProfileIsNotUniqueException
+            raise CustomerProfileIsNotUniqueError
         except Exception as e:
             logger.error(e)
             raise e
@@ -48,7 +48,7 @@ class CustomerProfileRepository:
         query = select(CustomerProfileOrm).where(CustomerProfileOrm.user_id == user_id)
         customer_profile = (await self._session.execute(query)).scalar_one_or_none()
         if not customer_profile:
-            raise CustomerProfileNotFoundException
+            raise CustomerProfileNotFoundError
         return CustomerProfileReadDTO.model_validate(customer_profile)
 
     async def get_customer_profile_by_id(
@@ -58,7 +58,7 @@ class CustomerProfileRepository:
         query = select(CustomerProfileOrm).where(CustomerProfileOrm.id == id)
         customer_profile = (await self._session.execute(query)).scalar_one_or_none()
         if not customer_profile:
-            raise CustomerProfileNotFoundException
+            raise CustomerProfileNotFoundError
         return customer_profile
 
     async def update_customer_profile_by_id(
@@ -75,7 +75,7 @@ class CustomerProfileRepository:
         )
         customer_profile = (await self._session.execute(stmt)).scalar_one_or_none()
         if not customer_profile:
-            raise CustomerProfileNotFoundException
+            raise CustomerProfileNotFoundError
         return customer_profile
 
     async def update_customer_profile_by_user_id(
@@ -92,7 +92,7 @@ class CustomerProfileRepository:
         )
         customer_profile = (await self._session.execute(stmt)).scalar_one_or_none()
         if not customer_profile:
-            raise CustomerProfileNotFoundException
+            raise CustomerProfileNotFoundError
         return customer_profile
 
     async def delete_customer_profile_by_user_id(
