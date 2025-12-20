@@ -4,7 +4,7 @@ from fastapi import APIRouter, Path
 from pydantic import PositiveInt
 from starlette import status
 
-from src.auth.dependencies import AdminRoleRequiredDI
+from src.entities.notary_profiles.dependencies import NotaryProfileRequiredDI
 from src.entities.service.dependencies import ServiceServiceDI
 from src.entities.service.exception_api_route import ServiceExceptionHandlerRoute
 from src.entities.service.exceptions.domain import (
@@ -33,7 +33,7 @@ services_router = APIRouter(
 @services_router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
-    dependencies=[AdminRoleRequiredDI],
+    dependencies=[NotaryProfileRequiredDI],
 )
 async def create_service(
     service_service: ServiceServiceDI,
@@ -60,7 +60,7 @@ async def get_service(
 
 @services_router.patch(
     "/{service_id}",
-    dependencies=[AdminRoleRequiredDI],
+    dependencies=[NotaryProfileRequiredDI],
 )
 async def update_service(
     service_service: ServiceServiceDI,
@@ -84,7 +84,7 @@ async def update_service(
 
 @services_router.delete(
     "/{service_id}",
-    dependencies=[AdminRoleRequiredDI],
+    dependencies=[NotaryProfileRequiredDI],
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_service(
