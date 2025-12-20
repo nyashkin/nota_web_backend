@@ -1,12 +1,12 @@
-from src.core.exceptions.domain import BaseDomainException
+from src.core.exceptions.domain import BaseDomainError
 
 
-class UserNotFoundException(BaseDomainException):
+class UserNotFoundError(BaseDomainError):
     def __str__(self) -> str:
         return "User not found"
 
 
-class UsernameAlredyExistsException(BaseDomainException):
+class UsernameAlredyExistsError(BaseDomainError):
     def __init__(self, username: str):
         self.username = username
 

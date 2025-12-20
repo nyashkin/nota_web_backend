@@ -25,3 +25,12 @@ class NotAuthenticatedHTTPException(BaseHTTPException):
             "Not authenticated",
             {"WWW-Authenticate": "Bearer"},
         )
+
+
+class AccessDeniedHTTPException(BaseHTTPException):
+    def __init__(self):
+        super().__init__(
+            status.HTTP_403_FORBIDDEN,
+            "Access denied",
+            None,
+        )

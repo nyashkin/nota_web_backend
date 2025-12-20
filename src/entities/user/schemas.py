@@ -1,29 +1,30 @@
-from datetime import datetime
-
-from pydantic import Field, PositiveInt
-
 from src.core.schemas import BaseAppSchema
-from src.entities.user.enums import UserRole
+from src.entities.user.dto import UserCreateDTO, UserFullDTO, UserReadDTO, UserUpdateDTO
 
 
-class UserUpdateSchema(BaseAppSchema):
-    username: str
-    phone_number: str = Field(min_length=5, max_length=20)
-    first_name: str = Field(min_length=2, max_length=20)
-    last_name: str = Field(min_length=2, max_length=20)
+class UserUpdateSchema(
+    UserUpdateDTO,
+    BaseAppSchema,
+):
+    pass
 
 
-class UserReadSchema(UserUpdateSchema):
-    id: PositiveInt
-    role: UserRole
-    created_at: datetime
-    updated_at: datetime
+class UserReadSchema(
+    UserReadDTO,
+    BaseAppSchema,
+):
+    pass
 
 
-class UserCreateSchema(UserUpdateSchema):
-    role: UserRole
-    password: str
+class UserCreateSchema(
+    UserCreateDTO,
+    BaseAppSchema,
+):
+    pass
 
 
-class UserFullSchema(UserCreateSchema):
-    id: int
+class UserFullSchema(
+    UserFullDTO,
+    BaseAppSchema,
+):
+    pass

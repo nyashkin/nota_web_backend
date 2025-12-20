@@ -26,3 +26,12 @@ class ServiceCategoryIdAndParentIdCannotBeEqualHTTPError(BaseHTTPException):
             "Service category id and parent id cannot be equal exception",
             None,
         )
+
+
+class ParentServiceCategoryNotFoundHTTPException(BaseHTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status.HTTP_400_BAD_REQUEST,
+            "Parent service category is not exists",
+            None,
+        )
