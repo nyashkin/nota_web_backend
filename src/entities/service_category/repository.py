@@ -1,6 +1,7 @@
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.entities.service_category.dto import (
     ServiceCategoryCreateDTO,
@@ -66,14 +67,20 @@ class ServiceCategoryRepository:
         return ServiceCategoryReadDTO.model_validate(category_orm)
 
     async def _get_category_orm_by_id(self, id: int) -> ServiceCategoryOrm | None:
-        query = select(ServiceCategoryOrm).where(ServiceCategoryOrm.id == id)
+        query = (
+            select(ServiceCategoryOrm)
+            .where(ServiceCategoryOrm.id == id)
+            .options(selectinload(ServiceCategoryOrm.services))
+        )
         category_orm: ServiceCategoryOrm | None = (
             await self._session.execute(query)
         ).scalar_one_or_none()
         return category_orm
 
     async def get_all(self) -> list[ServiceCategoryReadDTO]:
-        query = select(ServiceCategoryOrm)
+        query = select(ServiceCategoryOrm).options(
+            selectinload(ServiceCategoryOrm.services)
+        )
         category_orms: list[ServiceCategoryOrm] = list(
             (await self._session.execute(query)).scalars().all(),
         )

@@ -4,7 +4,6 @@ from decimal import Decimal
 from pydantic import Field
 
 from src.core.dto import BaseDTO
-from src.entities.service_category.schemas import ServiceCategoryReadSchema
 
 
 class ServiceUpdateDTO(BaseDTO):
@@ -22,4 +21,4 @@ class ServiceReadDTO(ServiceUpdateDTO):
     id: int
     created_at: datetime
     updated_at: datetime
-    category: ServiceCategoryReadSchema | None
+    category_id: int

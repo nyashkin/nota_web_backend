@@ -34,3 +34,9 @@ class ServiceCategoryOrm(BaseOrm, IdMixin, TimestampMixin):
         uselist=True,
         single_parent=True,
     )
+
+    services = relationship(
+        "ServiceOrm",
+        back_populates="category",
+        uselist=True,
+    )

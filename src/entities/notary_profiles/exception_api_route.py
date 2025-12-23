@@ -5,6 +5,8 @@ from fastapi import Request, Response
 from fastapi.routing import APIRoute
 from loguru import logger
 
+from src.entities.booking.exceptions.domain import BookingsNotFoundError
+from src.entities.booking.exceptions.http import BookingsNotFoundHTTPException
 from src.entities.notary_profiles.exceptions.domain import (
     NotaryProfileIsNotUniqueError,
     NotaryProfileNotFoundError,
@@ -26,6 +28,8 @@ class NotaryProfileExceptionApiRoute(APIRoute):
                 raise NotaryProfileNotFoundHTTPException
             except NotaryProfileIsNotUniqueError:
                 raise NotaryProfileIsNotUniqueHTTPException
+            except BookingsNotFoundError:
+                raise BookingsNotFoundHTTPException
             except Exception as e:
                 logger.error(e)
                 raise e
