@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Path
+from fastapi.responses import StreamingResponse
 from pydantic import PositiveInt
 from typing_extensions import Annotated
 
@@ -114,3 +115,25 @@ async def create_customer_profile_booking(
         )
     )
     return booking
+
+
+@customer_profiles_router.get(
+    "/me/bookings/{booking_id}/receipt",
+    dependencies=[CustomerProfileRequiredDI],
+    response_class=StreamingResponse,
+)
+async def download_booking_receipt(
+    bookings_service: BookingServiceDI,
+    current_profile: CustomerProfileDI,
+    booking_id: Annotated[PositiveInt, Path()],
+) -> StreamingResponse:
+    pdf_bytes, filename = await bookings_service.generate_receipt_for_customer(
+        booking_id,
+        current_profile.id,
+    )
+
+    return StreamingResponse(
+        iter([pdf_bytes]),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

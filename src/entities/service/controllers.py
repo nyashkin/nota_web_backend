@@ -8,10 +8,12 @@ from src.entities.notary_profiles.dependencies import NotaryProfileRequiredDI
 from src.entities.service.dependencies import ServiceServiceDI
 from src.entities.service.exception_api_route import ServiceExceptionHandlerRoute
 from src.entities.service.exceptions.domain import (
+    NotPositiveServicePriceError,
     NotUniqueServiceTitleError,
     ServiceNotFoundError,
 )
 from src.entities.service.exceptions.http import (
+    NotPositiveServicePriceHTTPException,
     NotUniqueServiceTitleHTTPException,
     ServiceNotFoundHTTPException,
 )
@@ -39,7 +41,12 @@ async def create_service(
     service_service: ServiceServiceDI,
     service_create: ServiceCreateSchema,
 ) -> ServiceReadSchema:
-    service_read_dto = await service_service.create_service(service_create)
+    try:
+        service_read_dto = await service_service.create_service(service_create)
+    except NotPositiveServicePriceError:
+        raise NotPositiveServicePriceHTTPException
+    except NotUniqueServiceTitleError:
+        raise NotUniqueServiceTitleHTTPException
     return ServiceReadSchema.model_validate(service_read_dto)
 
 
@@ -76,6 +83,8 @@ async def update_service(
         raise ServiceNotFoundHTTPException
     except NotUniqueServiceTitleError:
         raise NotUniqueServiceTitleHTTPException
+    except NotPositiveServicePriceError:
+        raise NotPositiveServicePriceHTTPException
     return ServiceReadSchema.model_validate(service_read_dto)
 
 

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic import PositiveInt
 
 from src.core.schemas import BaseAppSchema
@@ -14,6 +16,9 @@ class BookingCreateSchema(BaseAppSchema):
 
 class BookingReadSchema(BaseAppSchema):
     id: int
+    commission_percent: Decimal
+    commission_amount: Decimal
+    total_amount: Decimal
     service: ServiceReadSchema
     notary_profile: NotaryProfileReadSchema
     customer_profile: CustomerProfileReadSchema

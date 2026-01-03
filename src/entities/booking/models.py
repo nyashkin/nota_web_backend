@@ -1,4 +1,6 @@
-from sqlalchemy import ForeignKey
+from decimal import Decimal
+
+from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.database.base_model import BaseOrm
@@ -21,6 +23,19 @@ class BookingOrm(BaseOrm, IdMixin, TimestampMixin):
 
     customer_profile_id: Mapped[Int64] = mapped_column(
         ForeignKey("customer_profiles.id"),
+        nullable=False,
+    )
+
+    commission_percent: Mapped[Decimal] = mapped_column(
+        Numeric(5, 2),
+        nullable=False,
+    )
+    commission_amount: Mapped[Decimal] = mapped_column(
+        Numeric(12, 2),
+        nullable=False,
+    )
+    total_amount: Mapped[Decimal] = mapped_column(
+        Numeric(12, 2),
         nullable=False,
     )
 

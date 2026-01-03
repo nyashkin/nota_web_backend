@@ -2,7 +2,10 @@ from pydantic import PositiveInt, PostgresDsn, SecretStr
 from pydantic_settings import BaseSettings
 
 
-class DatabaseConfig(BaseSettings, env_prefix="DB_"):
+class DatabaseConfig(
+    BaseSettings,
+    env_prefix="DB_",
+):
     host: str
     port: PositiveInt
     name: str

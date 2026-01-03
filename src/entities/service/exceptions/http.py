@@ -31,3 +31,12 @@ class ServiceCategoryForServiceNotFoundHTTPException(BaseHTTPException):
             f"Service category with id {service_category_id} not found",
             None,
         )
+
+
+class NotPositiveServicePriceHTTPException(BaseHTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status.HTTP_400_BAD_REQUEST,
+            "Service price must be greater than zero",
+            None,
+        )

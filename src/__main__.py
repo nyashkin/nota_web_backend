@@ -25,7 +25,7 @@ def include_routers(app: FastAPI):
 
 
 def set_middlewares(app: FastAPI):
-    origins = config.api.cors_origins
+    origins = config.server.cors_origins
 
     app.add_middleware(
         CORSMiddleware,
@@ -38,8 +38,8 @@ def set_middlewares(app: FastAPI):
 
 def get_app() -> FastAPI:
     app = FastAPI(
-        title=config.api.title,
-        debug=config.api.debug,
+        title=config.server.title,
+        debug=config.server.debug,
     )
 
     @app.get(
@@ -61,6 +61,6 @@ app = get_app()
 if __name__ == "__main__":
     uvicorn.run(
         "src.__main__:app",
-        port=config.api.port,
-        host=config.api.host,
+        port=config.server.port,
+        host=config.server.host,
     )

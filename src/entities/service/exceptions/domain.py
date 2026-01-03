@@ -23,3 +23,8 @@ class NotUniqueServiceTitleError(BaseDomainError):
 
     def __str__(self) -> str:
         return f"Service with title {self.title} already exists"
+
+
+class NotPositiveServicePriceError(BaseDomainError):
+    def __str__(self) -> str:
+        return "Service price must be greater than zero"

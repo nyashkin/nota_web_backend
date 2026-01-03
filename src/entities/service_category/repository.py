@@ -30,7 +30,10 @@ class ServiceCategoryRepository:
         self._session.add(category_orm)
         try:
             await self._session.flush()
-            await self._session.refresh(category_orm)
+            await self._session.refresh(
+                category_orm,
+                attribute_names=["services"],
+            )
             if category_orm.id == category_orm.parent_id:
                 raise ServiceCategoryIdAndParentIdCannotBeEqualHTTPError
         except IntegrityError:
@@ -49,7 +52,10 @@ class ServiceCategoryRepository:
             for key, val in update_category.model_dump(exclude_unset=True).items():
                 category_orm.__setattr__(key, val)
             await self._session.flush()
-            await self._session.refresh(category_orm)
+            await self._session.refresh(
+                category_orm,
+                attribute_names=["services"],
+            )
             if category_orm.id == category_orm.parent_id:
                 raise ServiceCategoryIdAndParentIdCannotBeEqualHTTPError
         except IntegrityError:

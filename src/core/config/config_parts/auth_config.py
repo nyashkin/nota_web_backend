@@ -5,7 +5,10 @@ from pydantic import PositiveInt, ValidationError, model_validator
 from pydantic_settings import BaseSettings
 
 
-class AuthConfig(BaseSettings, env_prefix="AUTH_"):
+class AuthConfig(
+    BaseSettings,
+    env_prefix="AUTH_",
+):
     access_token_expire_hours: PositiveInt
     refresh_token_expire_days: PositiveInt
     private_key: str
@@ -18,7 +21,9 @@ class AuthConfig(BaseSettings, env_prefix="AUTH_"):
 
         try:
             jwt_encoded: str = jwt.encode(
-                payload=some_payload, key=self.private_key, algorithm=self.algorithm,
+                payload=some_payload,
+                key=self.private_key,
+                algorithm=self.algorithm,
             )
             jwt.decode(jwt_encoded, key=self.public_key, algorithms=[self.algorithm])
 

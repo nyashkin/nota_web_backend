@@ -1,6 +1,7 @@
 from src.core.database.dependencies import UoWDI
 from src.entities.service.dto import ServiceCreateDTO, ServiceReadDTO, ServiceUpdateDTO
 from src.entities.service.exceptions.domain import (
+    NotPositiveServicePriceError,
     ServiceCategoryForServiceNotFoundError,
 )
 
@@ -13,6 +14,8 @@ class ServiceService:
         self,
         service_create: ServiceCreateDTO,
     ) -> ServiceReadDTO:
+        if service_create.price <= 0:
+            raise NotPositiveServicePriceError
         service_category = await self._uow.service_categories.get_category_by_id(
             service_create.category_id,
         )
@@ -40,6 +43,8 @@ class ServiceService:
         service_id: int,
         service_update: ServiceUpdateDTO,
     ) -> ServiceReadDTO:
+        if service_update.price <= 0:
+            raise NotPositiveServicePriceError
         return await self._uow.services.update_service(
             service_id,
             service_update,
