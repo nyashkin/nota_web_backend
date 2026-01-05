@@ -12,7 +12,9 @@ class BookingOrm(BaseOrm, IdMixin, TimestampMixin):
     __tablename__ = "bookings"
 
     service_id: Mapped[Int64] = mapped_column(
-        ForeignKey("services.id"),
+        ForeignKey(
+            "services.id",
+        ),
         nullable=False,
     )
 
@@ -42,6 +44,7 @@ class BookingOrm(BaseOrm, IdMixin, TimestampMixin):
     service = relationship(
         "ServiceOrm",
         lazy="joined",
+        back_populates="bookings",
         uselist=False,
     )
 

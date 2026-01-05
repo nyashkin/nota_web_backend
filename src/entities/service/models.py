@@ -27,3 +27,10 @@ class ServiceOrm(BaseOrm, IdMixin, TimestampMixin):
         "ServiceCategoryOrm",
         back_populates="services",
     )
+
+    bookings = relationship(
+        "BookingOrm",
+        uselist=True,
+        back_populates="service",
+        cascade="all, delete-orphan",
+    )
