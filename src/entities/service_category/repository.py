@@ -54,7 +54,11 @@ class ServiceCategoryRepository:
             await self._session.flush()
             await self._session.refresh(
                 category_orm,
-                attribute_names=["services"],
+                attribute_names=[
+                    "services",
+                    "updated_at",
+                    "created_at",
+                ],
             )
             if category_orm.id == category_orm.parent_id:
                 raise ServiceCategoryIdAndParentIdCannotBeEqualHTTPError
