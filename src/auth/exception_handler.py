@@ -7,10 +7,12 @@ from starlette.responses import Response
 from src.auth.exceptions.domain import (
     InvalidJwtTokenError,
     JwtTokenExpiredError,
+    PasswordOrUsernameInvalidError,
 )
 from src.auth.exceptions.http import (
     InvalidJwtTokenHTTPException,
     JwtTokenExpiredHTTPException,
+    NotAuthenticatedHTTPException,
 )
 from src.entities.user.exception_handler import UserExceptionHandlerRoute
 
@@ -26,6 +28,8 @@ class AuthExceptionHandlerRoute(UserExceptionHandlerRoute):
                 raise JwtTokenExpiredHTTPException
             except InvalidJwtTokenError:
                 raise InvalidJwtTokenHTTPException
+            except PasswordOrUsernameInvalidError:
+                raise NotAuthenticatedHTTPException
             except Exception as e:
                 logger.error(e)
                 raise

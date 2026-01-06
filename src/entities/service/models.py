@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -8,6 +9,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.core.database.base_model import BaseOrm
 from src.core.database.mixins import IdMixin, TimestampMixin
 from src.core.database.types import Int64, Str128, Str256
+
+if TYPE_CHECKING:
+    from src.entities.booking.models import BookingOrm
 
 
 class ServiceOrm(BaseOrm, IdMixin, TimestampMixin):
@@ -26,6 +30,13 @@ class ServiceOrm(BaseOrm, IdMixin, TimestampMixin):
     category = relationship(
         "ServiceCategoryOrm",
         back_populates="services",
+    )
+
+    bookings: Mapped[list["BookingOrm"]] = relationship(
+        "BookingOrm",
+        back_populates="service",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
     bookings = relationship(

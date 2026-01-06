@@ -14,6 +14,7 @@ class BookingOrm(BaseOrm, IdMixin, TimestampMixin):
     service_id: Mapped[Int64] = mapped_column(
         ForeignKey(
             "services.id",
+            ondelete="CASCADE",
         ),
         nullable=False,
     )
