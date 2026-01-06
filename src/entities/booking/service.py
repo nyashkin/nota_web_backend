@@ -1,4 +1,5 @@
 from decimal import ROUND_HALF_UP, Decimal
+from pathlib import Path
 from typing import Tuple
 
 from fpdf import FPDF
@@ -110,27 +111,29 @@ class BookingService:
         content_width = pdf.w - pdf.l_margin - pdf.r_margin
         left_col_width = content_width * 0.6
 
-        pdf.set_font("Courier", "B", 12)
+        font_family = self._ensure_pdf_fonts(pdf)
+
+        pdf.set_font(font_family, "B", 12)
         pdf.cell(0, 6, "BOOKING RECEIPT", ln=1, align="C")
-        pdf.set_font("Courier", "", 9)
+        pdf.set_font(font_family, "", 9)
         pdf.cell(0, 5, f"Booking ID: {booking.id}", ln=1, align="C")
         pdf.ln(2)
 
         pdf.cell(0, 0, "-" * 32, ln=1)
         pdf.ln(2)
 
-        pdf.set_font("Courier", "B", 9)
+        pdf.set_font(font_family, "B", 9)
         pdf.cell(0, 5, "SERVICE", ln=1)
-        pdf.set_font("Courier", "", 9)
+        pdf.set_font(font_family, "", 9)
         pdf.set_x(pdf.l_margin)
         pdf.multi_cell(content_width, 4, booking.service.title)
         pdf.set_x(pdf.l_margin)
         pdf.multi_cell(content_width, 4, booking.service.description)
         pdf.ln(1)
 
-        pdf.set_font("Courier", "B", 9)
+        pdf.set_font(font_family, "B", 9)
         pdf.cell(0, 5, "NOTARY", ln=1)
-        pdf.set_font("Courier", "", 9)
+        pdf.set_font(font_family, "", 9)
         pdf.set_x(pdf.l_margin)
         pdf.multi_cell(
             content_width,
@@ -146,11 +149,11 @@ class BookingService:
         pdf.cell(0, 0, "-" * 32, ln=1)
         pdf.ln(2)
 
-        pdf.set_font("Courier", "B", 9)
+        pdf.set_font(font_family, "B", 9)
         pdf.set_x(pdf.l_margin)
         pdf.cell(left_col_width, 5, "Item", border=0)
         pdf.cell(0, 5, "Amount", align="R", ln=1)
-        pdf.set_font("Courier", "", 9)
+        pdf.set_font(font_family, "", 9)
         pdf.set_x(pdf.l_margin)
         pdf.cell(left_col_width, 5, "Service price", border=0)
         pdf.cell(0, 5, self._format_currency(booking.service.price), align="R", ln=1)
@@ -171,7 +174,7 @@ class BookingService:
         pdf.set_x(pdf.l_margin)
         pdf.cell(left_col_width, 5, "-" * 16, border=0)
         pdf.cell(0, 5, "-" * 10, align="R", ln=1)
-        pdf.set_font("Courier", "B", 10)
+        pdf.set_font(font_family, "B", 10)
         pdf.set_x(pdf.l_margin)
         pdf.cell(left_col_width, 6, "TOTAL", border=0)
         pdf.cell(0, 6, self._format_currency(booking.total_amount), align="R", ln=1)
@@ -179,7 +182,7 @@ class BookingService:
         pdf.ln(2)
         pdf.cell(0, 0, "-" * 32, ln=1)
         pdf.ln(2)
-        pdf.set_font("Courier", "", 9)
+        pdf.set_font(font_family, "", 9)
         pdf.set_x(pdf.l_margin)
         pdf.multi_cell(
             content_width,
@@ -195,3 +198,32 @@ class BookingService:
 
     def _format_currency(self, amount: Decimal) -> str:
         return f"{Decimal(str(amount)):.2f}"
+
+    def _ensure_pdf_fonts(self, pdf: FPDF) -> str:
+        """Register bundled Unicode font if it's not added yet."""
+        font_family = "CourierPrime"
+        font_path = Path(__file__).parent / "fonts" / "CourierPrime-Regular.ttf"
+        font_path_str = str(font_path.resolve())
+
+        # FPDF stores font keys in lowercase family + style suffix
+        regular_key = (font_family.lower(), "")
+        bold_key = (font_family.lower(), "B")
+
+        if regular_key not in pdf.fonts:
+            pdf.add_font(
+                font_family,
+                "",
+                font_path_str,
+                uni=True,
+            )
+        if bold_key not in pdf.fonts:
+            # Bold variant not provided; reuse regular file to avoid errors on set_font(..., "B", ...)
+            pdf.add_font(
+                font_family,
+                "B",
+                font_path_str,
+                uni=True,
+            )
+
+        pdf.set_font(font_family, "", 9)
+        return font_family
