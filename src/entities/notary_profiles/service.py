@@ -51,3 +51,7 @@ class NotaryProfileService:
             raise NotaryProfileNotFoundError
 
         return NotaryProfileReadDTO.model_validate(notary_profile)
+
+    async def get_all_notary_profiles(self) -> list[NotaryProfileReadDTO]:
+        notary_profiles = await self._uow.notary_profiles.get_all_notary_profiles()
+        return notary_profiles

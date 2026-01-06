@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.auth.dependencies import CurrentUserDI, NotaryRoleRequiredDI
+from src.auth.dependencies import AuthRequiredDI, CurrentUserDI, NotaryRoleRequiredDI
 from src.entities.booking.dependencies import BookingServiceDI
 from src.entities.booking.schemas import BookingReadSchema
 from src.entities.notary_profiles.dependencies import (
@@ -71,6 +71,21 @@ async def update_me_notary_profile(
         notary_profile_update_schema,
     )
     return NotaryProfileReadSchema.model_validate(notary_profile_dto)
+
+
+@notary_profiles_router.get(
+    "/",
+    dependencies=[AuthRequiredDI],
+    response_model=list[NotaryProfileReadSchema],
+)
+async def get_notaries_list(
+    notary_profile_service: NotaryProfileServiceDI,
+) -> list[NotaryProfileReadSchema]:
+    notary_profiles_dto = await notary_profile_service.get_all_notary_profiles()
+    return [
+        NotaryProfileReadSchema.model_validate(notary_profile_dto)
+        for notary_profile_dto in notary_profiles_dto
+    ]
 
 
 @notary_profiles_router.get(

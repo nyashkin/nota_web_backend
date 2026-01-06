@@ -61,6 +61,15 @@ class NotaryProfileRepository:
             raise NotaryProfileNotFoundError
         return notary_profile
 
+    async def get_all_notary_profiles(self) -> list[NotaryProfileReadDTO]:
+        query = select(NotaryProfileOrm)
+        result = await self._session.execute(query)
+        notary_profiles = result.scalars().all()
+        return [
+            NotaryProfileReadDTO.model_validate(notary_profile)
+            for notary_profile in notary_profiles
+        ]
+
     async def update_notary_profile_by_id(
         self,
         profile_id: int,
